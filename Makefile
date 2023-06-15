@@ -10,7 +10,8 @@ install:
 
 ensure-poetry:
 	@if [ "$(shell which poetry)" = "" ]; then \
-		echo "Did you activate the outer conda environment?"; \
+		echo "Did you activate the outer conda environment? Run: conda activate llm-math-education"; \
+		exit 1; \
 	else \
 		echo "Found existing Poetry installation at $(shell which poetry)."; \
 	fi

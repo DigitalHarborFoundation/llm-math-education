@@ -4,15 +4,21 @@ External math knowledge for math QA.
 
 ### Local development setup
 
-#### Python env
+#### First-time setup
 
-Install conda or miniconda.
+This repository uses Conda to manage two dependencies: Python and Poetry.
+
+Install conda or miniconda. Then, create the needed environment, called `llm-math-education`.
 
 ```bash
 conda create -f environment.yml
 ```
 
-TODO update me with instructions on Make
+#### Python
+
+Activate the conda environment: `conda activate llm-math-education`
+
+Use `make install` to install all needed dependencies.
 
 #### OpenAI API env variable
 
