@@ -2,9 +2,9 @@
 
 External math knowledge for math QA.
 
-### Local development setup
+## Local development setup
 
-#### First-time setup
+### First-time setup
 
 This repository uses Conda to manage two dependencies: Python and Poetry.
 
@@ -14,13 +14,14 @@ Install conda or miniconda. Then, create the needed environment, called `llm-mat
 conda create -f environment.yml
 ```
 
-#### Python
+### Python development
 
-Activate the conda environment: `conda activate llm-math-education`
+1. Activate the conda environment: `conda activate llm-math-education`
+2. Use `make install` to install all needed dependencies (including the pre-commit hooks).
 
-Use `make install` to install all needed dependencies.
+Ideally, the Makefile would activate the needed conda environment, but I don't actually know enough `make` to add that.
 
-#### OpenAI API env variable
+### OpenAI API env variable
 
 Create a `.env` file in the project root with your OpenAI API key defined as an environment variable inside it:
 
@@ -28,13 +29,14 @@ Create a `.env` file in the project root with your OpenAI API key defined as an 
 echo "OPENAI_API_KEY={your-api-key-here}" > .env
 ```
 
-#### Run tests
+### Run tests
 
 ```bash
 make test
 ```
 
-#### Other useful commands
+### Other useful commands
 
  - `poetry run <command>` - Run the given command, e.g. `poetry run pytest` invokes the tests.
  - `source $(poetry env info --path)/bin/activate` - An alternative to `poetry shell` that's less buggy in conda environments.
+ - `poetry add <package>` - Add the given package as a dependency. Use flag `-G dev` to add it as a development dependency.

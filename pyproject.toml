@@ -13,6 +13,7 @@ repository = "https://github.com/levon003/llm-math-education.git"
 [tool.poetry.dependencies]
 python = ">=3.9"
 jupyter = "^1.0.0"
+dotfile = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
