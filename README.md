@@ -40,3 +40,4 @@ make test
  - `poetry run <command>` - Run the given command, e.g. `poetry run pytest` invokes the tests.
  - `source $(poetry env info --path)/bin/activate` - An alternative to `poetry shell` that's less buggy in conda environments.
  - `poetry add <package>` - Add the given package as a dependency. Use flag `-G dev` to add it as a development dependency.
+ - `conda remove -n llm-math-education --all` - Tear it all down, so first-time setup can be repeated.
