@@ -6,12 +6,12 @@ External math knowledge for math QA.
 
 ### First-time setup
 
-This repository uses Conda to manage two dependencies: Python and Poetry.
+This repository uses Conda to manage two dependencies: Python and Poetry. ([This SO post](https://stackoverflow.com/a/71110028) provides more context on using Conda and Poetry together.)
 
 Install conda or miniconda. Then, create the needed environment, called `llm-math-education`.
 
 ```bash
-conda create -f environment.yml
+conda env create -f environment.yml
 ```
 
 ### Python development

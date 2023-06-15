@@ -11,9 +11,10 @@ packages = [{include = "llm-math-education", from = "src"}]
 repository = "https://github.com/levon003/llm-math-education.git"
 
 [tool.poetry.dependencies]
-python = ">=3.9"
+python = ">=3.9,<4.0"
+poetry = "1.4.0"
 jupyter = "^1.0.0"
-dotfile = "^0.9.0"
+urllib3 = "<=2.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
@@ -24,6 +25,7 @@ nbqa = "^1.6.0"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
+jupyterlab = "^4.0.2"
 
 [build-system]
 requires = ["poetry-core"]
