@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "llm-math-education"
+version = "0.1.0"
+description = "Retrieval-backed LLMs"
+authors = [
+    "Zachary Levonian <zach@digitalharbor.org>"
+]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "llm-math-education", from = "src"}]
+repository = "https://github.com/levon003/llm-math-education.git"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+jupyter = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+black = "^22.12.0"
+isort = "^5.12"
+flake8 = "^6.0.0"
+nbqa = "^1.6.0"
+pre-commit = "^2.21.0"
+pytest = "^7.2.1"
+pytest-cov = "^4.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+/(
+      .eggs         # exclude a few common directories in the
+    | .git          # root of the project
+    | .github
+    | .gitignore
+    | .hg
+    | .mypy_cache
+    | .tox
+    | .venv
+    | venv
+    | _build
+    | buck-out
+    | build
+    | ci
+    | data
+    | dist
+    | docs
+    | docsrc
+  )/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 79
+multi_line_output = 3
+include_trailing_comma = true
+virtual_env = "venv"
