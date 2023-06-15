@@ -7,7 +7,7 @@ authors = [
 ]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "llm-math-education", from = "src"}]
+packages = [{include = "llm_math_education", from = "src"}]
 repository = "https://github.com/levon003/llm-math-education.git"
 
 [tool.poetry.dependencies]
@@ -16,6 +16,7 @@ poetry = "1.4.0"
 jupyter = "^1.0.0"
 urllib3 = "<=2.0"
 python-dotenv = "^1.0.0"
+openai = "^0.27.8"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
