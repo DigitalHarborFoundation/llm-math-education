@@ -20,7 +20,7 @@ def test_ChatLog(tmp_path):
         "object": "chat.completion",
         "created": 1686870764,
         "model": "gpt-3.5-turbo",
-        "choices": {},
+        "choices": [],
         "usage": {},
     }
     chat_log.log_chat_completion(chat_id, messages_list, completion_dict)

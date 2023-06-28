@@ -1,4 +1,4 @@
-.PHONY: help install ensure-poetry install-precommits install-kernel test
+.PHONY: help install ensure-poetry install-precommits install-kernel test run-streamlit
 
 help:
 	@echo "Relevant targets are 'install' and 'test'."
@@ -30,3 +30,6 @@ jupyter:
 
 test:
 	@poetry run pytest --cov=src --cov-report term-missing
+
+run-streamlit:
+	@streamlit run src/app.py --
