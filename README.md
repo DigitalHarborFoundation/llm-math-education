@@ -41,3 +41,22 @@ make test
  - `source $(poetry env info --path)/bin/activate` - An alternative to `poetry shell` that's less buggy in conda environments.
  - `poetry add <package>` - Add the given package as a dependency. Use flag `-G dev` to add it as a development dependency.
  - `conda remove -n llm-math-education --all` - Tear it all down, so first-time setup can be repeated.
+
+### Anserini support
+
+To use Pyserini, need to install a few additional things.
+
+First, Java 7+ JDK should be installed and configured reasonably. I installed the latest build (JDK 20.0.1) with no issues.
+
+To install NMSLib: (see [issue](https://github.com/nmslib/nmslib/issues/476))
+    CFLAGS="-mavx -DWARN(a)=(a)" pip install --use-pep517 nmslib
+
+Ultimately, I added it to a new dependency group (`anserini`) like so:
+    CFLAGS="-mavx -DWARN(a)=(a)" poetry add nmslib -G anserini
+
+This likely means that rebuilds won't succeed without first installing nmslib with these CFLAGS, although I haven't tested it. Use `poetry install --with anserini` to include during a build.
+
+FAISS (needed for Pyserini) installed in the outer conda environment:
+    conda install -c pytorch faiss-cpu
+
+I did not include the FAISS dependency in `environment.yaml`.
