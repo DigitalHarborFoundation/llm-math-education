@@ -26,6 +26,7 @@ httpx = "^0.24.1"
 scipy = "^1.11.0"
 scikit-learn = "^1.2.2"
 torch = "^2.0.1"
+beautifulsoup4 = "^4.12.2"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
