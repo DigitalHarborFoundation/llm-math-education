@@ -32,4 +32,4 @@ test:
 	@poetry run pytest --cov=src --cov-report term-missing
 
 run-streamlit:
-	@streamlit run src/app.py --
+	@streamlit run src/🤖_Math_QA.py --

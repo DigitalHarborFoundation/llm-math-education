@@ -60,3 +60,28 @@ FAISS (needed for Pyserini) installed in the outer conda environment:
     conda install -c pytorch faiss-cpu
 
 I did not include the FAISS dependency in `environment.yaml`.
+
+### Streamlit
+
+A few notes about the app.
+
+#### Authentication
+
+For local development, streamlit secrets need to be stored in `.streamlit/secrets.toml`
+
+Here's a sample file:
+```
+OPENAI_API_KEY = "{key goes here}"
+AUTH_TOKEN = "argon2:$argon2id$v=19$m=10240,t=10,p=8$MuVIOw20jkOi1nKR90hPhA$H22nY8aNyfztLYQCSj5NRw5/Cy2WOo6kl3K61RyaoZY"
+```
+
+To generate the auth_token:
+```
+>>> import notebook.auth.security
+>>> notebook.auth.security.passwd()
+Enter password: abc
+Verify password: abc
+'argon2:$argon2id$v=19$m=10240,t=10,p=8$MuVIOw20jkOi1nKR90hPhA$H22nY8aNyfztLYQCSj5NRw5/Cy2WOo6kl3K61RyaoZY'
+```
+
+If the AUTH_TOKEN is provided in the secrets, can authenticate automatically via URL parameter, e.g. `{base_url}?auth_token=abc`.
