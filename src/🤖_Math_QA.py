@@ -3,12 +3,13 @@ from datetime import datetime
 
 import notebook.auth.security
 import openai
-import pandas as pd
 import streamlit as st
 
+from llm_math_education import prompt_utils
+from llm_math_education.prompts import mathqa
+from streamlit_app import custom_textarea
+
 # from pathlib import Path
-
-
 # from llm_math_education import chat_db
 
 
@@ -26,6 +27,15 @@ def get_avatar(role: str) -> str:
     elif role == "assistant":
         return "🤖"
     return None
+
+
+if "system_prompt_text_area" not in st.session_state:
+    st.session_state.system_prompt_text_area = "Default system prompt 1"
+    st.session_state.system_prompt = "Default system prompt 1"
+
+
+def update_system_prompt():
+    pass
 
 
 if "is_authorized" not in st.session_state or not st.session_state.is_authorized:
@@ -63,13 +73,13 @@ The prompt can be edited to adjust that behavior.
 
 After each query, the associated prompt is included in a drop-down (including any retrieved information).""",
     )
-    st.write(
-        pd.DataFrame(
-            {
-                "role": ["system", "assistant"],
-                "content": ["Loinasdfasdjfh, afhlakjsdhf lakjsdfh alksjdfh alsdkjh \n\ndafalhsdfkjadfs", "Short text."],
-            },
-        ),
+    prompt_manager = prompt_utils.PromptManager(mathqa.intro_prompts)
+    _, system_textarea_key = custom_textarea.insert_textarea_with_selectbox(
+        ["Prompt 1"],
+        ["General middle-school math prompt"],
+        "System prompt to use:",
+        "mathqa_system_prompt",
+        custom_option_name="Custom prompt",
     )
 
 # initialize history
