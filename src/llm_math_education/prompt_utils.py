@@ -84,7 +84,7 @@ class PromptManager:
                     slot_fill_dict = self.retrieval_strategy.do_retrieval(
                         expected_slots,
                         user_query,
-                        previous_messages,
+                        messages,
                     )
                     message["content"] = message["content"].format(**slot_fill_dict)
 

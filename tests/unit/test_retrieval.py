@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from llm_math_education import embedding_utils, retrieval
 
@@ -23,7 +24,7 @@ def test_RetrievalDb(tmp_path, monkeypatch):
             },
         ],
     )
-    db = retrieval.RetrievalDb(tmp_path, "testDb", df, "text")
+    db = retrieval.RetrievalDb(tmp_path, "testDb", "text", df)
     assert not db.embedding_filepath.exists()
     assert not db.df_filepath.exists()
     db.create_embeddings()
@@ -32,8 +33,12 @@ def test_RetrievalDb(tmp_path, monkeypatch):
     db.save_df()
     assert db.df_filepath.exists()
 
-    db = retrieval.RetrievalDb(tmp_path, "testDb", None, "text")
+    db = retrieval.RetrievalDb(tmp_path, "testDb", "text")
     assert len(db.df) == len(df)
 
     distances = db.compute_string_distances("Test query.")
     assert len(distances) == len(df)
+
+    # test non-existent db loading
+    with pytest.raises(ValueError):
+        retrieval.RetrievalDb(tmp_path, "testDb2", "text")

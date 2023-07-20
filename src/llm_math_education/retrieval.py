@@ -25,8 +25,8 @@ class RetrievalDb:
         self,
         embedding_dir: Path,
         db_name: str,
-        df: Optional[pd.DataFrame],
         embed_col: str,
+        df: Optional[pd.DataFrame] = None,
         n_tokens_col: str = "n_tokens",
     ):
         self.embedding_dir = embedding_dir
@@ -63,6 +63,8 @@ class RetrievalDb:
         self.df.to_parquet(self.df_filepath)
 
     def load(self):
+        if not self.df_filepath.exists():
+            raise ValueError(f"Trying to load a dataframe from non-existent path: {self.df_filepath}")
         self.df = pd.read_parquet(self.df_filepath)
         self.embedding_mat = np.load(self.embedding_filepath)
 
