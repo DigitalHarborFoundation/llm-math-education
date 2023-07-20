@@ -48,6 +48,7 @@ def insert_textarea_with_selectbox(
         text_option_names + [custom_option_name],
         key=selectbox_key,
         on_change=selectbox_change,
+        label_visibility="visible" if len(selectbox_label) > 0 else "collapsed",
     )
     st.text_area(
         selectbox_label + " text area",
