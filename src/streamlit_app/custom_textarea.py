@@ -5,7 +5,8 @@ def insert_textarea_with_selectbox(
     text_options: list[str],
     text_option_names: list[str],
     selectbox_label: str,
-    key_prefix: str,
+    selectbox_key: str,
+    textarea_key: str,
     custom_option_name: str = "Custom",
     selectbox_label_visibility: str = "collapsed",
 ):
@@ -23,9 +24,6 @@ def insert_textarea_with_selectbox(
     """
     assert len(text_options) == len(text_option_names), "Options and option names should be the same length."
     assert len(text_options) > 0, "Must provide at least one option."
-
-    selectbox_key = key_prefix + "_selectbox"
-    textarea_key = key_prefix + "_textarea"
 
     def selectbox_change():
         if st.session_state[selectbox_key] != custom_option_name:

@@ -39,6 +39,11 @@ def get_avatar(role: str) -> str:
     return None
 
 
+def session_restart_button_clicked():
+    st.session_state.chat_messages = [get_header_message()]
+    st.session_state.prompt_manager.clear_stored_messages()
+
+
 def update_temperature_setting():
     locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
     temperature_str = st.session_state["temperature_text_input"]
@@ -70,9 +75,6 @@ if "is_authorized" not in st.session_state or not st.session_state.is_authorized
     if not st.session_state.is_authorized:
         # block the rest of the page!
         pass
-
-
-openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # settings
 setting_defaults = {
@@ -110,6 +112,10 @@ if "student_queries" not in st.session_state:
     else:
         st.session_state["student_queries"] = []
 
+if "prompt_manager" not in st.session_state:
+    st.session_state.prompt_manager = prompt_utils.PromptManager()
+
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
 st.markdown(
@@ -140,25 +146,26 @@ The prompt can be edited to adjust that behavior.
 
 After each query, the associated prompt is included in a drop-down (including any retrieved information).""",
     )
-    prompt_manager = prompt_utils.PromptSelector(mathqa.intro_prompts)
+    prompt_selector = prompt_utils.PromptSelector(mathqa.intro_prompts)
     text_options = [
         prompt_utils.PromptSelector.convert_conversation_to_string(messages)
-        for messages in prompt_manager.get_intro_prompt_message_lists()
+        for messages in prompt_selector.get_intro_prompt_message_lists()
     ]
-    _, system_textarea_key = custom_textarea.insert_textarea_with_selectbox(
+    custom_textarea.insert_textarea_with_selectbox(
         text_options,
-        prompt_manager.get_intro_prompt_pretty_names(),
+        prompt_selector.get_intro_prompt_pretty_names(),
         "System prompt",
-        "mathqa_system_prompt",
+        "mathqa_system_prompt_selectbox",
+        "mathqa_system_prompt_textarea",
         custom_option_name="Custom prompt",
     )
     try:
         intro_prompt_messages = prompt_utils.PromptSelector.convert_string_to_conversation(
-            st.session_state[system_textarea_key],
+            st.session_state["mathqa_system_prompt_textarea"],
         )
     except Exception:
         st.warning("Syntax error in prompt.")
-    # TODO set intro prompt messages in a PromptManager or similar
+    st.session_state.prompt_manager.set_intro_messages(intro_prompt_messages)
 
 # initialize history
 if "chat_messages" not in st.session_state:
@@ -169,7 +176,7 @@ for message in st.session_state.chat_messages:
         st.markdown(message["content"])
 
 user_query = st.chat_input(
-    "Ask a question about math" if len(st.session_state.chat_messages) <= 1 else "Ask a follow-up question",
+    "Ask a question about math",  # if len(st.session_state.chat_messages) <= 1 else "Ask a follow-up question"
 )
 if user_query:
     # st.write(f"User wrote: {user_query}")
@@ -189,7 +196,10 @@ if user_query:
         displayed_message = ""
 
         with st.spinner(""):
-            time.sleep(1)  # imitate API delay
+            # time.sleep(1)  # imitate API delay
+            messages = st.session_state.prompt_manager.build_query(user_query)
+            print(messages)
+            # completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-0613", messages=messages)
         assistant_message = {
             "role": "assistant",
             "content": "Not yet implemented\n\nThis response contains newlines.",
@@ -211,9 +221,12 @@ if user_query:
 
 # Sidebar
 with st.sidebar:
-    st.markdown("Options")
-    if st.button("Start a new session", disabled=len(st.session_state.chat_messages) <= 1):
-        st.session_state.chat_messages = [get_header_message()]
+    st.markdown("### Options")
+    st.button(
+        "Start new chat",
+        disabled=len(st.session_state.chat_messages) <= 1,
+        on_click=session_restart_button_clicked,
+    )
 
     with st.expander("Advanced"):
         st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")

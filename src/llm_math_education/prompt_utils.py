@@ -61,9 +61,12 @@ class PromptSelector:
 
 
 class PromptManager:
+    """Stores prompts and generates message lists for passing to the OpenAI API."""
+
     def __init__(self):
         self.intro_messages: list[dict[str, str]] = []
-        self.retrieval_strategy: retrieval_strategies.RetrievalStrategy = retrieval_strategies.NoRetrievalStrategy
+        self.retrieval_strategy: retrieval_strategies.RetrievalStrategy = retrieval_strategies.NoRetrievalStrategy()
+        self.stored_messages: list[dict[str, str]] = []
 
     def set_intro_messages(self, intro_messages: list[dict[str, str]]) -> PromptManager:
         self.intro_messages = intro_messages
@@ -73,7 +76,17 @@ class PromptManager:
         self.retrieval_strategy = retrieval_strategy
         return self
 
-    def build_query(self, user_query: str, previous_messages: list[dict[str, str]] = []):
+    def add_stored_message(self, message: dict[str, str]) -> PromptManager:
+        self.stored_messages.append(message)
+        return self
+
+    def clear_stored_messages(self) -> PromptManager:
+        self.stored_messages.clear()
+        return self
+
+    def build_query(self, user_query: str, previous_messages: list[dict[str, str]] | None = None):
+        if previous_messages is None:
+            previous_messages = self.stored_messages
         messages = []
         if len(previous_messages) == 0:
             # this is a new query
@@ -86,10 +99,15 @@ class PromptManager:
                         user_query,
                         messages,
                     )
-                    message["content"] = message["content"].format(**slot_fill_dict)
+                    assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
+                    try:
+                        message["content"] = message["content"].format(**slot_fill_dict)
+                    except KeyError:
+                        raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}.")
 
         else:
             messages += previous_messages
+        # TODO identify if the user query has slots to fill
         messages.append(
             {
                 "role": "user",
