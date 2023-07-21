@@ -7,6 +7,7 @@ def insert_textarea_with_selectbox(
     selectbox_label: str,
     key_prefix: str,
     custom_option_name: str = "Custom",
+    selectbox_label_visibility: str = "collapsed",
 ):
     """Generates a selectbox and textarea.
 
@@ -48,7 +49,7 @@ def insert_textarea_with_selectbox(
         text_option_names + [custom_option_name],
         key=selectbox_key,
         on_change=selectbox_change,
-        label_visibility="visible" if len(selectbox_label) > 0 else "collapsed",
+        label_visibility=selectbox_label_visibility,
     )
     st.text_area(
         selectbox_label + " text area",

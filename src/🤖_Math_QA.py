@@ -148,7 +148,7 @@ After each query, the associated prompt is included in a drop-down (including an
     _, system_textarea_key = custom_textarea.insert_textarea_with_selectbox(
         text_options,
         prompt_manager.get_intro_prompt_pretty_names(),
-        "",
+        "System prompt",
         "mathqa_system_prompt",
         custom_option_name="Custom prompt",
     )
