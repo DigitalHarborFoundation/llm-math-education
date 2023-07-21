@@ -1,30 +1,32 @@
 import locale
 import time
 from datetime import datetime
+from pathlib import Path
 
 import notebook.auth.security
 import openai
+import pandas as pd
 import streamlit as st
 
 from llm_math_education import prompt_utils, retrieval_strategies
 from llm_math_education.prompts import mathqa
 from streamlit_app import custom_textarea
 
-# from pathlib import Path
-# from llm_math_education import chat_db
-
+MAX_TOKENS = 4096
 RETRIEVAL_OPTIONS_MAP = {
     "None": retrieval_strategies.NoRetrievalStrategy,
     "Rori micro-lessons only": retrieval_strategies.NoRetrievalStrategy,
     "Rori + Pre-algebra textbook": retrieval_strategies.NoRetrievalStrategy,
 }
 RETRIEVAL_OPTIONS_LIST = list(RETRIEVAL_OPTIONS_MAP.keys())
+SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
 
 
-def get_header_message():
+def get_header_message() -> str:
+    """This is the header message that is shown to the user, which is not used as a system or assistant message."""
     return {
         "role": "assistant",
-        "content": "header message",
+        "content": "Hi there! I'm here to help you with any math questions you have! What's your question?",
         "timestamp": int(datetime.now().timestamp()),
     }
 
@@ -84,18 +86,51 @@ for key_name, default_value in setting_defaults.items():
     if key_name not in st.session_state:
         st.session_state[key_name] = default_value
 
-if "temperature" not in st.session_state:
-    st.session_state["temperature"] = float(setting_defaults["temperature_text_input"])
+if "student_queries" not in st.session_state:
+    # load the student question data
+    data_dir = Path("./data")
+    if data_dir.exists():
+        mn_general_student_queries_filepath = data_dir / "derived" / "mn_general_student_queries.csv"
+        query_df = pd.read_csv(mn_general_student_queries_filepath)
+        st.session_state["student_queries"] = [
+            {
+                "category": "Geometry" if row.subject_name == "Geometry" else "Algebra",
+                "query": row.post_content.strip().replace("[Continued:]", "\n"),
+            }
+            for row in query_df.sample(frac=1).itertuples()
+            if row.is_respondable_query == "general"
+        ]
+        st.session_state["student_queries"].insert(
+            0,
+            {
+                "category": None,
+                "query": "(Choose a student question from MathNation)",
+            },
+        )
+    else:
+        st.session_state["student_queries"] = []
+
 
 st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
 st.markdown(
-    """# Math Question-Answering
+    """# Math Question-Answering with ChatGPT
 
-Ask math questions.
+Ask math questions, receive curriculum-based answers.
+
+This demo explores the feasibility of providing a math-related dialogues to answer middle-school student questions.
+
+Start with a question, and then ask follow-up questions.
 """,
 )
-st.write(f"Authorized: {st.session_state.is_authorized}")
-# chat_log = chat_db.ChatLog(Path("data/chat_logs"))
+# st.write(f"Authorized: {st.session_state.is_authorized}")
+st.selectbox(
+    "If you need some ideas, try a real student question:",
+    [q["query"] for q in st.session_state["student_queries"]],
+)
+# TODO add a key and callback to this selectbox
+
+st.write("You can also customize the prompt that the dialogue system uses:")
+
 
 with st.expander("System prompts"):
     st.markdown(
@@ -177,12 +212,13 @@ if user_query:
 # Sidebar
 with st.sidebar:
     st.markdown("Options")
-    if st.button("Start a new session"):  # , disabled=len(st.session_state.chat_messages) <= 1):
+    if st.button("Start a new session", disabled=len(st.session_state.chat_messages) <= 1):
         st.session_state.chat_messages = [get_header_message()]
-    st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")
-    # TODO compute token counts as well
 
     with st.expander("Advanced"):
+        st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")
+        st.markdown(f"Used tokens: TODO / {MAX_TOKENS}")
+        # TODO compute token counts as well
         st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
         if not st.session_state["temperature_text_input_valid"]:
             st.warning("Invalid temperature setting; should be a decimal between 0 and 1.")
