@@ -20,6 +20,7 @@ RETRIEVAL_OPTIONS_MAP = {
 }
 RETRIEVAL_OPTIONS_LIST = list(RETRIEVAL_OPTIONS_MAP.keys())
 SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
+STUDENT_QUERY_SELECTION_STRING = "(Choose a student question from MathNation)"
 
 
 def get_header_message() -> str:
@@ -39,9 +40,63 @@ def get_avatar(role: str) -> str:
     return None
 
 
-def session_restart_button_clicked():
+def restart_chat_session():
     st.session_state.chat_messages = [get_header_message()]
     st.session_state.prompt_manager.clear_stored_messages()
+    # note: can only do this state update in a callback / before the app is built!
+    st.session_state.student_query_selectbox = STUDENT_QUERY_SELECTION_STRING
+
+
+def session_restart_button_clicked():
+    restart_chat_session()
+
+
+def student_query_selectbox_changed():
+    if st.session_state.student_query_selectbox != STUDENT_QUERY_SELECTION_STRING:
+        st.session_state.student_query_selectbox_new_value = st.session_state.student_query_selectbox
+        # st.session_state.student_query_selectbox = STUDENT_QUERY_SELECTION_STRING
+        # TODO might want to restart the current session here...
+
+
+def process_user_query(user_query: str):
+    user_message = {
+        "role": "user",
+        "content": user_query,
+        "timestamp": int(datetime.now().timestamp()),
+    }
+    st.session_state.chat_messages.append(user_message)
+
+    # display user's new query
+    with st.chat_message("user", avatar=get_avatar("user")):
+        st.markdown(user_query)
+
+    with st.chat_message("assistant", avatar=get_avatar("assistant")):
+        message_placeholder = st.empty()
+        displayed_message = ""
+
+        with st.spinner(""):
+            time.sleep(1)  # imitate API delay
+            messages = st.session_state.prompt_manager.build_query(user_query)
+            print(messages)
+            # completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-0613", messages=messages)
+        assistant_message = {
+            "role": "assistant",
+            "content": "Not yet implemented\n\nThis response contains newlines.",
+            "timestamp": int(datetime.now().timestamp()),
+        }
+        response = assistant_message["content"]
+        for char in response:
+            displayed_message += char
+            if char == "\n":
+                time.sleep(0.06)
+            elif char == " ":
+                time.sleep(0.04)
+            else:
+                time.sleep(0.005)
+            message_placeholder.markdown(displayed_message + "▌")
+        message_placeholder.markdown(displayed_message)
+
+        st.session_state.chat_messages.append(assistant_message)
 
 
 def update_temperature_setting():
@@ -83,7 +138,10 @@ setting_defaults = {
     "temperature_text_input_valid": True,
     "retrieval_strategy": RETRIEVAL_OPTIONS_MAP[RETRIEVAL_OPTIONS_LIST[0]],
     "retrieval_radio": RETRIEVAL_OPTIONS_LIST[0],
+    "student_query_selectbox_new_value": None,
 }
+# initialize all values in the settings dict
+# (happens only on the first run each session)
 for key_name, default_value in setting_defaults.items():
     if key_name not in st.session_state:
         st.session_state[key_name] = default_value
@@ -106,7 +164,7 @@ if "student_queries" not in st.session_state:
             0,
             {
                 "category": None,
-                "query": "(Choose a student question from MathNation)",
+                "query": STUDENT_QUERY_SELECTION_STRING,
             },
         )
     else:
@@ -117,123 +175,102 @@ if "prompt_manager" not in st.session_state:
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
-st.markdown(
-    """# Math Question-Answering with ChatGPT
+
+def build_app():
+    # build the actual app
+    st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
+    st.markdown(
+        """# Math Question-Answering with ChatGPT
 
 Ask math questions, receive curriculum-based answers.
 
 This demo explores the feasibility of providing a math-related dialogues to answer middle-school student questions.
 
-Start with a question, and then ask follow-up questions.
-""",
-)
-# st.write(f"Authorized: {st.session_state.is_authorized}")
-st.selectbox(
-    "If you need some ideas, try a real student question:",
-    [q["query"] for q in st.session_state["student_queries"]],
-)
-# TODO add a key and callback to this selectbox
+Start with a question, and then ask follow-up questions.""",
+    )
+    # st.write(f"Authorized: {st.session_state.is_authorized}")
+    st.selectbox(
+        "If you need some ideas, try a real student question:",
+        [q["query"] for q in st.session_state["student_queries"]],
+        key="student_query_selectbox",
+        on_change=student_query_selectbox_changed,
+    )
 
-st.write("You can also customize the prompt that the dialogue system uses:")
+    st.write("You can also customize the prompt that the dialogue system uses.")
 
-
-with st.expander("System prompts"):
-    st.markdown(
-        """ChatGPT accepts a _prompt_, a text description of the expected behavior.
+    with st.expander("System prompts"):
+        st.markdown(
+            """ChatGPT accepts a _prompt_, a text description of the expected behavior.
 
 The prompt can be edited to adjust that behavior.
 
 After each query, the associated prompt is included in a drop-down (including any retrieved information).""",
-    )
-    prompt_selector = prompt_utils.PromptSelector(mathqa.intro_prompts)
-    text_options = [
-        prompt_utils.PromptSelector.convert_conversation_to_string(messages)
-        for messages in prompt_selector.get_intro_prompt_message_lists()
-    ]
-    custom_textarea.insert_textarea_with_selectbox(
-        text_options,
-        prompt_selector.get_intro_prompt_pretty_names(),
-        "System prompt",
-        "mathqa_system_prompt_selectbox",
-        "mathqa_system_prompt_textarea",
-        custom_option_name="Custom prompt",
-    )
-    try:
-        intro_prompt_messages = prompt_utils.PromptSelector.convert_string_to_conversation(
-            st.session_state["mathqa_system_prompt_textarea"],
         )
-    except Exception:
-        st.warning("Syntax error in prompt.")
-    st.session_state.prompt_manager.set_intro_messages(intro_prompt_messages)
+        prompt_selector = prompt_utils.PromptSelector(mathqa.intro_prompts)
+        text_options = [
+            prompt_utils.PromptSelector.convert_conversation_to_string(messages)
+            for messages in prompt_selector.get_intro_prompt_message_lists()
+        ]
+        custom_textarea.insert_textarea_with_selectbox(
+            text_options,
+            prompt_selector.get_intro_prompt_pretty_names(),
+            "System prompt",
+            "mathqa_system_prompt_selectbox",
+            "mathqa_system_prompt_textarea",
+            custom_option_name="Custom prompt",
+        )
+        try:
+            intro_prompt_messages = prompt_utils.PromptSelector.convert_string_to_conversation(
+                st.session_state["mathqa_system_prompt_textarea"],
+            )
+        except Exception:
+            st.warning("Syntax error in prompt.")
+        st.session_state.prompt_manager.set_intro_messages(intro_prompt_messages)
 
-# initialize history
-if "chat_messages" not in st.session_state:
-    st.session_state.chat_messages = [get_header_message()]
+    # initialize history
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = [get_header_message()]
 
-for message in st.session_state.chat_messages:
-    with st.chat_message(message["role"], avatar=get_avatar(message["role"])):
-        st.markdown(message["content"])
+    for message in st.session_state.chat_messages:
+        with st.chat_message(message["role"], avatar=get_avatar(message["role"])):
+            st.markdown(message["content"])
 
-user_query = st.chat_input(
-    "Ask a question about math",  # if len(st.session_state.chat_messages) <= 1 else "Ask a follow-up question"
-)
-if user_query:
-    # st.write(f"User wrote: {user_query}")
-    user_message = {
-        "role": "user",
-        "content": user_query,
-        "timestamp": int(datetime.now().timestamp()),
-    }
-    st.session_state.chat_messages.append(user_message)
-
-    # display user's new query
-    with st.chat_message("user", avatar=get_avatar("user")):
-        st.markdown(user_query)
-
-    with st.chat_message("assistant", avatar=get_avatar("assistant")):
-        message_placeholder = st.empty()
-        displayed_message = ""
-
-        with st.spinner(""):
-            # time.sleep(1)  # imitate API delay
-            messages = st.session_state.prompt_manager.build_query(user_query)
-            print(messages)
-            # completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-0613", messages=messages)
-        assistant_message = {
-            "role": "assistant",
-            "content": "Not yet implemented\n\nThis response contains newlines.",
-            "timestamp": int(datetime.now().timestamp()),
-        }
-        response = assistant_message["content"]
-        for char in response:
-            displayed_message += char
-            if char == "\n":
-                time.sleep(0.06)
-            elif char == " ":
-                time.sleep(0.04)
-            else:
-                time.sleep(0.005)
-            message_placeholder.markdown(displayed_message + "▌")
-        message_placeholder.markdown(displayed_message)
-
-        st.session_state.chat_messages.append(assistant_message)
-
-# Sidebar
-with st.sidebar:
-    st.markdown("### Options")
-    st.button(
-        "Start new chat",
-        disabled=len(st.session_state.chat_messages) <= 1,
-        on_click=session_restart_button_clicked,
+    new_chat_input_value = st.chat_input(
+        "Ask a question about math",  # we would prefer to update this conditionally, but: https://github.com/streamlit/streamlit/issues/7054
+        key="chat_input_key",
     )
 
-    with st.expander("Advanced"):
-        st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")
-        st.markdown(f"Used tokens: TODO / {MAX_TOKENS}")
-        # TODO compute token counts as well
-        st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
-        if not st.session_state["temperature_text_input_valid"]:
-            st.warning("Invalid temperature setting; should be a decimal between 0 and 1.")
+    # first check to see if this is from the checkbox
+    user_query = None
+    if st.session_state.student_query_selectbox_new_value is not None:
+        user_query = st.session_state.student_query_selectbox_new_value
+        st.session_state.student_query_selectbox_new_value = None
+    elif new_chat_input_value:
+        assert new_chat_input_value == st.session_state.chat_input_key
+        user_query = new_chat_input_value
+    if user_query is not None and user_query.strip() != "":
+        # note: we can't do this in a callback, unfortunately,
+        # as we need the app to be already built when we create the new elements
+        process_user_query(user_query.strip())
 
-        st.radio("Retrieval:", RETRIEVAL_OPTIONS_LIST, key="retrieval_radio", on_change=update_retrieval_setting)
+    # Build sidebar
+    with st.sidebar:
+        st.markdown("### Options")
+        st.button(
+            "Start new chat",
+            disabled=len(st.session_state.chat_messages) <= 1,
+            on_click=session_restart_button_clicked,
+        )
+
+        with st.expander("Advanced"):
+            st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")
+            st.markdown(f"Used tokens: TODO / {MAX_TOKENS}")
+            # TODO compute token counts as well
+            st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
+            if not st.session_state["temperature_text_input_valid"]:
+                st.warning("Invalid temperature setting; should be a decimal between 0 and 1.")
+
+            st.radio("Retrieval:", RETRIEVAL_OPTIONS_LIST, key="retrieval_radio", on_change=update_retrieval_setting)
+
+
+build_app()
