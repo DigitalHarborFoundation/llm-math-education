@@ -23,7 +23,7 @@ SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
 STUDENT_QUERY_SELECTION_STRING = "(Choose a student question from MathNation)"
 
 
-def get_header_message() -> str:
+def get_header_message() -> dict[str, object]:
     """This is the header message that is shown to the user, which is not used as a system or assistant message."""
     return {
         "role": "assistant",
@@ -32,7 +32,7 @@ def get_header_message() -> str:
     }
 
 
-def get_avatar(role: str) -> str:
+def get_avatar(role: str) -> str | None:
     if role == "user":
         return "🧑‍🎓"
     elif role == "assistant":
@@ -77,13 +77,11 @@ def process_user_query(user_query: str):
         with st.spinner(""):
             time.sleep(1)  # imitate API delay
             messages = st.session_state.prompt_manager.build_query(user_query)
-            print(messages)
-            # completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-0613", messages=messages)
-        assistant_message = {
-            "role": "assistant",
-            "content": "Not yet implemented\n\nThis response contains newlines.",
-            "timestamp": int(datetime.now().timestamp()),
-        }
+            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-0613", messages=messages)
+            assistant_message = completion["choices"][0]["message"]
+            assert "role" in assistant_message and "content" in assistant_message
+            st.session_state.prompt_manager.add_stored_message(assistant_message)
+            # TODO add timestamp to message: int(datetime.now().timestamp())
         response = assistant_message["content"]
         for char in response:
             displayed_message += char
@@ -128,7 +126,7 @@ if "is_authorized" not in st.session_state or not st.session_state.is_authorized
         if notebook.auth.security.passwd_check(st.secrets["AUTH_TOKEN"], auth_token):
             st.session_state.is_authorized = True
     if not st.session_state.is_authorized:
-        # block the rest of the page!
+        # block the rest of the page/app! Needs discussion
         pass
 
 # settings
@@ -139,12 +137,18 @@ setting_defaults = {
     "retrieval_strategy": RETRIEVAL_OPTIONS_MAP[RETRIEVAL_OPTIONS_LIST[0]],
     "retrieval_radio": RETRIEVAL_OPTIONS_LIST[0],
     "student_query_selectbox_new_value": None,
+    "show_expert_controls": False,
 }
 # initialize all values in the settings dict
 # (happens only on the first run each session)
 for key_name, default_value in setting_defaults.items():
     if key_name not in st.session_state:
         st.session_state[key_name] = default_value
+
+query_params = st.experimental_get_query_params()
+if "show_expert_controls" in query_params:
+    if query_params["show_expert_controls"][0] == "True":
+        st.session_state.show_expert_controls = True
 
 if "student_queries" not in st.session_state:
     # load the student question data
@@ -262,15 +266,22 @@ After each query, the associated prompt is included in a drop-down (including an
             on_click=session_restart_button_clicked,
         )
 
-        with st.expander("Advanced"):
-            st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")
-            st.markdown(f"Used tokens: TODO / {MAX_TOKENS}")
-            # TODO compute token counts as well
-            st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
-            if not st.session_state["temperature_text_input_valid"]:
-                st.warning("Invalid temperature setting; should be a decimal between 0 and 1.")
+        if st.session_state.show_expert_controls:
+            with st.expander("Advanced"):
+                st.markdown(f"Conversation length: {len(st.session_state.chat_messages)}")
+                st.markdown(
+                    f"Used tokens: {st.session_state.prompt_manager.compute_stored_token_counts()} / {MAX_TOKENS}",
+                )
+                st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
+                if not st.session_state["temperature_text_input_valid"]:
+                    st.warning("Invalid temperature setting; should be a decimal between 0 and 1.")
 
-            st.radio("Retrieval:", RETRIEVAL_OPTIONS_LIST, key="retrieval_radio", on_change=update_retrieval_setting)
+                st.radio(
+                    "Retrieval:",
+                    RETRIEVAL_OPTIONS_LIST,
+                    key="retrieval_radio",
+                    on_change=update_retrieval_setting,
+                )
 
 
 build_app()

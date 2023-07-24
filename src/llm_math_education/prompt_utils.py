@@ -104,17 +104,28 @@ class PromptManager:
                         message["content"] = message["content"].format(**slot_fill_dict)
                     except KeyError:
                         raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}.")
-
+            # store the intro messages
+            self.stored_messages.extend(messages)
         else:
+            # not a new query,
+            # so include the previous messages as context
             messages += previous_messages
         # TODO identify if the user query has slots to fill
-        messages.append(
-            {
-                "role": "user",
-                "content": user_query,
-            },
-        )
+        user_message = {
+            "role": "user",
+            "content": user_query,
+        }
+        self.stored_messages.append(user_message)
+        messages.append(user_message)
         return messages
+
+    def compute_stored_token_counts(self) -> int:
+        total_token_count = 0
+        for message in self.stored_messages:
+            content = message["content"]
+            token_count = len(content.split())
+            total_token_count += token_count
+        return total_token_count
 
     def identify_slots(prompt_string):
         expected_slots = re.findall(r"{[^{} ]+}", prompt_string)
