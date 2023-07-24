@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from llm_math_education import retrieval_strategies
+from llm_math_education import embedding_utils, retrieval_strategies
 
 VALID_ROLES = ["user", "assistant", "system"]
 
@@ -120,11 +120,8 @@ class PromptManager:
         return messages
 
     def compute_stored_token_counts(self) -> int:
-        total_token_count = 0
-        for message in self.stored_messages:
-            content = message["content"]
-            token_count = len(content.split())
-            total_token_count += token_count
+        token_counts = embedding_utils.get_token_counts([message["content"] for message in self.stored_messages])
+        total_token_count = sum(token_counts)
         return total_token_count
 
     def identify_slots(prompt_string):
