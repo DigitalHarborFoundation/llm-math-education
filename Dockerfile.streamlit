@@ -1,0 +1,18 @@
+FROM python:3.10
+
+RUN python -m pip install --upgrade pip
+
+WORKDIR /usr/app
+COPY ./streamlit-requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
+COPY ./src ./src
+COPY ./tests ./tests
+
+COPY ./dist ./dist
+RUN pip install ./dist/*.whl
+
+#RUN pip install -e .
+
+EXPOSE 8502
+ENTRYPOINT ["streamlit", "run", "src/🤖_Math_QA.py", "--server.port=8502", "--server.address=0.0.0.0"]

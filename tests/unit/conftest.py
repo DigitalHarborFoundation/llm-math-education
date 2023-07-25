@@ -34,3 +34,12 @@ def retrieval_db_path(tmp_path, monkeypatch):
     db.create_embeddings()
     db.save_df()
     return tmp_path
+
+
+@pytest.fixture(autouse=True)
+def no_openai(monkeypatch):
+    """Remove Embedding and ChatCompletion creations during all tests.
+
+    This is probably not necessary given the dotenv configuration."""
+    monkeypatch.delattr("openai.Embedding.create")
+    monkeypatch.delattr("openai.ChatCompletion.create")

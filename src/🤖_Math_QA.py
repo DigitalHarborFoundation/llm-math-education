@@ -1,4 +1,5 @@
 import locale
+import logging
 import time
 from datetime import datetime
 from pathlib import Path
@@ -14,9 +15,9 @@ from streamlit_app import custom_textarea
 
 MAX_TOKENS = 4096
 RETRIEVAL_OPTIONS_MAP = {
-    "None": retrieval_strategies.NoRetrievalStrategy,
-    "Rori micro-lessons only": retrieval_strategies.NoRetrievalStrategy,
-    "Rori + Pre-algebra textbook": retrieval_strategies.NoRetrievalStrategy,
+    "None": retrieval_strategies.NoRetrievalStrategy(),
+    "Rori micro-lessons only": retrieval_strategies.NoRetrievalStrategy(),
+    "Rori + Pre-algebra textbook": retrieval_strategies.NoRetrievalStrategy(),
 }
 RETRIEVAL_OPTIONS_LIST = list(RETRIEVAL_OPTIONS_MAP.keys())
 SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
@@ -112,7 +113,11 @@ def update_temperature_setting():
 
 def update_retrieval_setting():
     retrieval_str = st.session_state["retrieval_radio"]
+    logging.info(
+        f"Updated retrieval strategy from {st.session_state.retrieval_strategy.__class__.__name__} to {RETRIEVAL_OPTIONS_MAP[retrieval_str].__class__.__name__}.",
+    )
     st.session_state["retrieval_strategy"] = RETRIEVAL_OPTIONS_MAP[retrieval_str]
+    st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
 
 
 if "is_authorized" not in st.session_state or not st.session_state.is_authorized:
@@ -147,7 +152,7 @@ for key_name, default_value in setting_defaults.items():
 
 query_params = st.experimental_get_query_params()
 if "show_expert_controls" in query_params:
-    if query_params["show_expert_controls"][0] == "True":
+    if query_params["show_expert_controls"][0].lower() == "true":
         st.session_state.show_expert_controls = True
 
 if "student_queries" not in st.session_state:

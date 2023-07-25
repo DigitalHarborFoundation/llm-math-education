@@ -1,4 +1,4 @@
-.PHONY: help install ensure-poetry install-precommits install-kernel test run-streamlit
+.PHONY: help install ensure-poetry install-precommits install-kernel test run-streamlit build-docker run-docker
 
 help:
 	@echo "Relevant targets are 'install' and 'test'."
@@ -30,6 +30,14 @@ jupyter:
 
 test:
 	@poetry run pytest --cov=src --cov-report term-missing
+
+build-docker:
+	@poetry build
+	@poetry export --without-hashes --format=requirements.txt > streamlit-requirements.txt
+	@docker build -t rori_streamlit -f Dockerfile.streamlit .
+
+run-docker:
+	@docker run -p 8502:8502 -v ./.env:/usr/app/.env -v ./.streamlit:/usr/app/.streamlit rori_streamlit:latest
 
 run-streamlit:
 	@streamlit run src/🤖_Math_QA.py --
