@@ -38,6 +38,8 @@ def test_RetrievalDb(tmp_path, monkeypatch):
 
     distances = db.compute_string_distances("Test query.")
     assert len(distances) == len(df)
+    top_df = db.get_top_df(distances, k=1)
+    assert len(top_df) == 1
 
     # test non-existent db loading
     with pytest.raises(ValueError):

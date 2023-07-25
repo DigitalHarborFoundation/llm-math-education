@@ -161,7 +161,7 @@ if "student_queries" not in st.session_state:
                 "category": "Geometry" if row.subject_name == "Geometry" else "Algebra",
                 "query": row.post_content.strip().replace("[Continued:]", "\n"),
             }
-            for row in query_df.sample(frac=1).itertuples()
+            for row in query_df.sample(frac=1, random_state=87896).itertuples()
             if row.is_respondable_query == "general"
         ]
         st.session_state["student_queries"].insert(
@@ -200,35 +200,42 @@ Start with a question, and then ask follow-up questions.""",
         on_change=student_query_selectbox_changed,
     )
 
-    st.write("You can also customize the prompt that the dialogue system uses.")
+    if st.session_state.show_expert_controls:
+        st.write("You can also customize the prompt that the dialogue system uses.")
 
-    with st.expander("System prompts"):
-        st.markdown(
-            """ChatGPT accepts a _prompt_, a text description of the expected behavior.
+        with st.expander("System prompts"):
+            st.markdown(
+                """ChatGPT accepts a _prompt_, a text description of the expected behavior.
 
 The prompt can be edited to adjust that behavior.
 
 After each query, the associated prompt is included in a drop-down (including any retrieved information).""",
-        )
-        prompt_selector = prompt_utils.PromptSelector(mathqa.intro_prompts)
-        text_options = [
-            prompt_utils.PromptSelector.convert_conversation_to_string(messages)
-            for messages in prompt_selector.get_intro_prompt_message_lists()
-        ]
-        custom_textarea.insert_textarea_with_selectbox(
-            text_options,
-            prompt_selector.get_intro_prompt_pretty_names(),
-            "System prompt",
-            "mathqa_system_prompt_selectbox",
-            "mathqa_system_prompt_textarea",
-            custom_option_name="Custom prompt",
-        )
-        try:
-            intro_prompt_messages = prompt_utils.PromptSelector.convert_string_to_conversation(
-                st.session_state["mathqa_system_prompt_textarea"],
             )
-        except Exception:
-            st.warning("Syntax error in prompt.")
+            prompt_selector = prompt_utils.PromptSelector(mathqa.intro_prompts)
+            text_options = [
+                prompt_utils.PromptSelector.convert_conversation_to_string(messages)
+                for messages in prompt_selector.get_intro_prompt_message_lists()
+            ]
+            custom_textarea.insert_textarea_with_selectbox(
+                text_options,
+                prompt_selector.get_intro_prompt_pretty_names(),
+                "System prompt",
+                "mathqa_system_prompt_selectbox",
+                "mathqa_system_prompt_textarea",
+                custom_option_name="Custom prompt",
+            )
+            # set the intro prompt
+            try:
+                intro_prompt_messages = prompt_utils.PromptSelector.convert_string_to_conversation(
+                    st.session_state["mathqa_system_prompt_textarea"],
+                )
+            except Exception:
+                st.warning("Syntax error in prompt.")
+            st.session_state.prompt_manager.set_intro_messages(intro_prompt_messages)
+    else:
+        # use the default prompt
+        prompt_selector = prompt_utils.PromptSelector(mathqa.intro_prompts)
+        intro_prompt_messages = prompt_selector.get_default_intro_prompt()["messages"]
         st.session_state.prompt_manager.set_intro_messages(intro_prompt_messages)
 
     # initialize history

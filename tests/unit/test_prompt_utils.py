@@ -19,7 +19,6 @@ def test_PromptSelector():
     test_prompts = {
         "test_prompt_1": {
             "pretty_name": "Prompt 1",
-            "expected_slots": [],
             "messages": [
                 {
                     "role": "system",
@@ -29,7 +28,6 @@ def test_PromptSelector():
         },
         "test_prompt_2": {
             "pretty_name": "Prompt 2",
-            "expected_slots": [],
             "messages": [
                 {
                     "role": "system",
@@ -43,6 +41,8 @@ def test_PromptSelector():
     message_lists = pm.get_intro_prompt_message_lists()
     assert message_lists[0] == test_prompts["test_prompt_1"]["messages"]
 
+    assert pm.get_default_intro_prompt()["pretty_name"] == "Prompt 1"
+
 
 def test_PromptManager():
     pm = prompt_utils.PromptManager()
@@ -51,6 +51,9 @@ def test_PromptManager():
     messages = pm.build_query("Test")
     assert len(messages) == 1
     assert messages[0]["content"] == "Test"
+    assert len(pm.stored_messages) == 1
+    assert pm.stored_messages[0]["content"] == "Test"
+    pm.clear_stored_messages()
 
     # test conversation start with system message
     test_intro_messages = [
@@ -61,10 +64,11 @@ def test_PromptManager():
     ]
     messages = pm.set_intro_messages(test_intro_messages).build_query("User")
     assert len(messages) == 2
-    assert messages[0]["role"] == "system"
+    assert messages[0]["role"] == "system", messages
     assert messages[0]["content"] == "System"
     assert messages[1]["role"] == "user"
     assert messages[1]["content"] == "User"
+    pm.clear_stored_messages()
 
     # test conversation continuation
     previous_messages = messages

@@ -86,6 +86,13 @@ class RetrievalDb:
         for query_embedding in query_embedding_list:
             yield self.compute_embedding_distances(query_embedding)
 
+    def get_top_df(self, distances: np.array, k: int = 5):
+        sort_inds = np.argsort(distances)
+        top_k_indices = sort_inds[:k]
+        top_k_scores = distances[top_k_indices]
+        assert top_k_indices.shape == top_k_scores.shape
+        return self.df.iloc[top_k_indices]
+
 
 def normalize_text(text: str) -> str:
     return text.replace("\n", " ").strip()

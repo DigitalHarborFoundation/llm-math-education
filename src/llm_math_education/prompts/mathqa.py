@@ -1,7 +1,6 @@
 intro_prompts = {
     "general_math_qa_intro": {
         "pretty_name": "General middle-school math prompt",
-        "expected_slots": ["retrieved_documents_string"],
         "messages": [
             {
                 "role": "system",

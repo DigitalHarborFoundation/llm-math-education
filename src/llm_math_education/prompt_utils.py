@@ -24,11 +24,14 @@ class PromptSelector:
             pretty_name_list.append(pretty_name)
         return pretty_name_list
 
-    def get_intro_prompt_message_lists(self):
+    def get_intro_prompt_message_lists(self) -> list[dict[str, str]]:
         message_lists = []
         for prompt_info in self.intro_prompt_dict.values():
             message_lists.append(prompt_info["messages"])
         return message_lists
+
+    def get_default_intro_prompt(self) -> dict[str]:
+        return self.intro_prompt_dict[next(iter(self.intro_prompt_dict.keys()))]
 
     def convert_conversation_to_string(messages):
         conversation_string = ""
@@ -124,6 +127,6 @@ class PromptManager:
         total_token_count = sum(token_counts)
         return total_token_count
 
-    def identify_slots(prompt_string):
+    def identify_slots(prompt_string: str) -> list[str]:
         expected_slots = re.findall(r"{[^{} ]+}", prompt_string)
         return [slot[1:-1] for slot in expected_slots]
