@@ -1,13 +1,20 @@
 import streamlit as st
 
+from streamlit_app import auth_utils
+
+
+def build_app():
+    st.markdown(
+        """# Hint generation
+
+Not yet implemented""",
+    )
+
+
 st.set_page_config(
     page_title="ChatGPT for middle-school math education - Hint generation",
     page_icon="💡",
 )
 
-st.markdown(
-    """# Hint generation
-
-Not yet implemented
-""",
-)
+if auth_utils.check_is_authorized():
+    build_app()

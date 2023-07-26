@@ -4,14 +4,13 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-import notebook.auth.security
 import openai
 import pandas as pd
 import streamlit as st
 
 from llm_math_education import prompt_utils, retrieval, retrieval_strategies
 from llm_math_education.prompts import mathqa
-from streamlit_app import custom_textarea
+from streamlit_app import auth_utils, custom_textarea
 
 DATA_DIR = Path("./data") / "app_data"
 MAX_TOKENS = 4096
@@ -134,20 +133,6 @@ def update_retrieval_setting():
     st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
 
 
-if "is_authorized" not in st.session_state or not st.session_state.is_authorized:
-    # attempt to authenticate from a URL parameter
-    query_params = st.experimental_get_query_params()
-    st.session_state.is_authorized = False
-    st.session_state.auth_token_provided = False
-    if "auth_token" in query_params and "AUTH_TOKEN" in st.secrets:
-        st.session_state.auth_token_provided = True
-        auth_token = query_params["auth_token"][0]
-        if notebook.auth.security.passwd_check(st.secrets["AUTH_TOKEN"], auth_token):
-            st.session_state.is_authorized = True
-    if not st.session_state.is_authorized:
-        # block the rest of the page/app! Needs discussion
-        pass
-
 # settings
 setting_defaults = {
     "temperature": 1.0,
@@ -264,7 +249,6 @@ if "is_openai_key_set" not in st.session_state or not st.session_state.is_openai
 
 def build_app():
     # build the actual app
-    st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
     st.markdown(
         """# Math Question-Answering with ChatGPT
 
@@ -274,7 +258,6 @@ This demo explores the feasibility of providing a math-related dialogues to answ
 
 Start with a question, and then ask follow-up questions.""",
     )
-    # st.write(f"Authorized: {st.session_state.is_authorized}")
     st.selectbox(
         "If you need some ideas, try a real student question:",
         [q["query"] for q in st.session_state["student_queries"]],
@@ -373,4 +356,6 @@ After each query, the associated prompt is included in a drop-down (including an
                 )
 
 
-build_app()
+st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
+if auth_utils.check_is_authorized():
+    build_app()
