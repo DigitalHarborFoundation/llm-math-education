@@ -1,0 +1,38 @@
+name: Build and push streamlit container
+on:
+  push:
+    branches: [main, dev]
+jobs:
+  build-container:
+    name: Build image
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: legible-labs-mockingbird
+      ARTIFACT_REPOSITORY: legible-labs-containers
+      IMAGE_NAME: llm-math-education-streamlit
+      TAG: latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Setup gcloud CLI
+      - uses: google-github-actions/setup-gcloud@v0
+        with:
+          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ env.PROJECT_ID }}
+          export_default_credentials: true
+
+      # Build docker image
+      - name: Build Image
+        run: |
+          docker build -t local_container -f Dockerfile.streamlit .
+          docker tag local_container us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - run: |
+          gcloud auth configure-docker us-east1-docker.pkg.dev -q
+      # Push image to Google Container Registry
+      - name: Push Image
+        run: |
+          docker push us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
