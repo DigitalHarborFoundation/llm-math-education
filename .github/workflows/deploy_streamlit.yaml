@@ -1,7 +1,7 @@
 name: Build and push streamlit container
 on:
   push:
-    branches: [main, dev]
+    branches: [release]
 jobs:
   build-container:
     name: Build image
