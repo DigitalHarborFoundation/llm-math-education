@@ -12,7 +12,5 @@ COPY ./tests ./tests
 COPY ./dist ./dist
 RUN pip install ./dist/*.whl
 
-#RUN pip install -e .
-
 EXPOSE 8502
 ENTRYPOINT ["streamlit", "run", "src/🤖_Math_QA.py", "--server.port=8502", "--server.address=0.0.0.0"]

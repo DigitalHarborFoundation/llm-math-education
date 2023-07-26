@@ -9,17 +9,18 @@ import openai
 import pandas as pd
 import streamlit as st
 
-from llm_math_education import prompt_utils, retrieval_strategies
+from llm_math_education import prompt_utils, retrieval, retrieval_strategies
 from llm_math_education.prompts import mathqa
 from streamlit_app import custom_textarea
 
+DATA_DIR = Path("./data") / "app_data"
 MAX_TOKENS = 4096
-RETRIEVAL_OPTIONS_MAP = {
-    "None": retrieval_strategies.NoRetrievalStrategy(),
-    "Rori micro-lessons only": retrieval_strategies.NoRetrievalStrategy(),
-    "Rori + Pre-algebra textbook": retrieval_strategies.NoRetrievalStrategy(),
-}
-RETRIEVAL_OPTIONS_LIST = list(RETRIEVAL_OPTIONS_MAP.keys())
+RETRIEVAL_OPTIONS_LIST = [
+    "None",
+    "Rori micro-lessons only",
+    "Pre-algebra textbook only",
+    "Rori + Pre-algebra textbook",
+]
 SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
 STUDENT_QUERY_SELECTION_STRING = "(Choose a student question from MathNation)"
 
@@ -76,9 +77,12 @@ def process_user_query(user_query: str):
         displayed_message = ""
 
         with st.spinner(""):
-            time.sleep(1)  # imitate API delay
             messages = st.session_state.prompt_manager.build_query(user_query)
-            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-0613", messages=messages)
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0613",
+                messages=messages,
+                temperature=st.session_state.temperature,
+            )
             assistant_message = completion["choices"][0]["message"]
             assert "role" in assistant_message and "content" in assistant_message
             st.session_state.prompt_manager.add_stored_message(assistant_message)
@@ -103,7 +107,7 @@ def update_temperature_setting():
     temperature_str = st.session_state["temperature_text_input"]
     try:
         new_temperature = locale.atof(temperature_str)
-        if new_temperature < 0 or new_temperature > 1:
+        if new_temperature < 0 or new_temperature > 2:
             raise ValueError("Invalid temperature range.")
         st.session_state["temperature"] = new_temperature
         st.session_state["temperature_text_input_valid"] = True
@@ -114,9 +118,9 @@ def update_temperature_setting():
 def update_retrieval_setting():
     retrieval_str = st.session_state["retrieval_radio"]
     logging.info(
-        f"Updated retrieval strategy from {st.session_state.retrieval_strategy.__class__.__name__} to {RETRIEVAL_OPTIONS_MAP[retrieval_str].__class__.__name__}.",
+        f"Updated retrieval strategy from {st.session_state.retrieval_strategy.__class__.__name__} to {st.session_state.retrieval_options_map[retrieval_str].__class__.__name__}.",
     )
-    st.session_state["retrieval_strategy"] = RETRIEVAL_OPTIONS_MAP[retrieval_str]
+    st.session_state["retrieval_strategy"] = st.session_state.retrieval_options_map[retrieval_str]
     st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
 
 
@@ -136,10 +140,9 @@ if "is_authorized" not in st.session_state or not st.session_state.is_authorized
 
 # settings
 setting_defaults = {
-    "temperature": 0.7,
-    "temperature_text_input": "0.7",
+    "temperature": 1.0,
+    "temperature_text_input": "1.0",
     "temperature_text_input_valid": True,
-    "retrieval_strategy": RETRIEVAL_OPTIONS_MAP[RETRIEVAL_OPTIONS_LIST[0]],
     "retrieval_radio": RETRIEVAL_OPTIONS_LIST[0],
     "student_query_selectbox_new_value": None,
     "show_expert_controls": False,
@@ -157,9 +160,8 @@ if "show_expert_controls" in query_params:
 
 if "student_queries" not in st.session_state:
     # load the student question data
-    data_dir = Path("./data")
-    if data_dir.exists():
-        mn_general_student_queries_filepath = data_dir / "derived" / "mn_general_student_queries.csv"
+    if DATA_DIR.exists():
+        mn_general_student_queries_filepath = DATA_DIR / "mn_general_student_queries.csv"
         query_df = pd.read_csv(mn_general_student_queries_filepath)
         st.session_state["student_queries"] = [
             {
@@ -177,7 +179,69 @@ if "student_queries" not in st.session_state:
             },
         )
     else:
-        st.session_state["student_queries"] = []
+        st.session_state["student_queries"] = [
+            {
+                "category": None,
+                "query": "(Failed to load student questions.)",
+            },
+        ]
+# load dbs for retrieval
+if "retrieval_db_map" not in st.session_state:
+    st.session_state.retrieval_db_map = {}
+    if DATA_DIR.exists():
+        loading_error = False
+        for db_name in ["rori_microlesson", "openstax_subsection"]:
+            try:
+                db = retrieval.RetrievalDb(DATA_DIR, db_name, "db_string")
+                st.session_state.retrieval_db_map[db_name] = db
+            except Exception:
+                logging.warning(f"Failed to load db {db_name}.")
+                loading_error = True
+                continue
+        # TODO determine what to do if a loading error occurs
+        rori_microlesson_db_info = {
+            "db": st.session_state.retrieval_db_map["rori_microlesson"],
+            "max_tokens": 2000,
+            "prefix": "Here is some lesson content that might be relevant:",
+        }
+        openstax_subsection_db_info = {
+            "db": st.session_state.retrieval_db_map["openstax_subsection"],
+            "max_tokens": 2000,
+            "prefix": "Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:",
+        }
+        rori_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+            {
+                "rori_microlesson_texts": rori_microlesson_db_info,
+            },
+        )
+        openstax_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+            {
+                "openstax_subsection_texts": openstax_subsection_db_info,
+            },
+        )
+        rori_microlesson_db_info = rori_microlesson_db_info.copy()
+        openstax_subsection_db_info = openstax_subsection_db_info.copy()
+        rori_microlesson_db_info["max_tokens"] /= 2
+        openstax_subsection_db_info["max_tokens"] /= 2
+        both_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+            {
+                "rori_microlesson_texts": rori_microlesson_db_info,
+                "openstax_subsection_texts": openstax_subsection_db_info,
+            },
+        )
+        retrieval_options_map = {}
+        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]] = retrieval_strategies.NoRetrievalStrategy()
+        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[1]] = rori_only_strategy
+        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[2]] = openstax_only_strategy
+        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[3]] = both_strategy
+        st.session_state.retrieval_options_map = retrieval_options_map
+    else:
+        # failed to load data, so can't do retrieval
+        # TODO warn the user that loading retrieval dbs failed
+        st.session_state.retrieval_options_map = {
+            key: retrieval_strategies.NoRetrievalStrategy() for key in RETRIEVAL_OPTIONS_LIST
+        }
+    st.session_state.retrieval_strategy = st.session_state.retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]]
 
 if "prompt_manager" not in st.session_state:
     st.session_state.prompt_manager = prompt_utils.PromptManager()
@@ -286,7 +350,7 @@ After each query, the associated prompt is included in a drop-down (including an
                 )
                 st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
                 if not st.session_state["temperature_text_input_valid"]:
-                    st.warning("Invalid temperature setting; should be a decimal between 0 and 1.")
+                    st.warning("Invalid temperature setting; should be a decimal between 0 and 2.")
 
                 st.radio(
                     "Retrieval:",

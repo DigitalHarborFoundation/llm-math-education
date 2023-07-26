@@ -37,7 +37,15 @@ build-docker:
 	@docker build -t rori_streamlit -f Dockerfile.streamlit .
 
 run-docker:
-	@docker run -p 8502:8502 -v ./.env:/usr/app/.env -v ./.streamlit:/usr/app/.streamlit rori_streamlit:latest
+	@docker run \
+	--name rori_streamlit_container \
+	-p 8502:8502 \
+	-v ./.env:/usr/app/.env \
+	-v ./.streamlit:/usr/app/.streamlit \
+	rori_streamlit:latest
+
+remove-docker:
+	@docker remove --volumes rori_streamlit_container
 
 run-streamlit:
 	@streamlit run src/🤖_Math_QA.py --
