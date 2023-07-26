@@ -63,15 +63,16 @@ class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
                 texts = []
                 total_tokens = 0
                 for ind in sort_inds:
-                    row = self.db.df.iloc[ind]
-                    n_tokens = row[self.db.n_tokens_col]
+                    row = db.df.iloc[ind]
+                    n_tokens = row[db.n_tokens_col]
                     if total_tokens + n_tokens > max_tokens:
                         break
                     total_tokens += n_tokens
-                    text = row[self.db.embed_col]
+                    text = row[db.embed_col]
                     texts.append(text)
                 prefix = db_info["prefix"] if "prefix" in db_info else ""
-                fill_string = prefix + "\n".join(texts)
+                suffix = db_info["suffix"] if "suffix" in db_info else ""
+                fill_string = prefix + "\n".join(texts) + suffix
             else:
                 fill_string = self.nonmatching_fill
             fill_string_map[expected_slot] = fill_string

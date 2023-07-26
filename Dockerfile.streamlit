@@ -8,6 +8,7 @@ RUN pip install -r requirements.txt
 
 COPY ./src ./src
 COPY ./tests ./tests
+COPY ./data/app_data ./data/app_data
 
 COPY ./dist ./dist
 RUN pip install ./dist/*.whl

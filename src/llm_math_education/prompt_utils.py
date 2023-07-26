@@ -70,6 +70,7 @@ class PromptManager:
         self.intro_messages: list[dict[str, str]] = []
         self.retrieval_strategy: retrieval_strategies.RetrievalStrategy = retrieval_strategies.NoRetrievalStrategy()
         self.stored_messages: list[dict[str, str]] = []
+        self.most_recent_slot_fill_dict: dict[str, str] = {}
 
     def set_intro_messages(self, intro_messages: list[dict[str, str]]) -> PromptManager:
         self.intro_messages = intro_messages
@@ -102,6 +103,7 @@ class PromptManager:
                         user_query,
                         messages,
                     )
+                    self.most_recent_slot_fill_dict = slot_fill_dict
                     assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
                     try:
                         message["content"] = message["content"].format(**slot_fill_dict)

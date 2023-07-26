@@ -16,10 +16,10 @@ from streamlit_app import custom_textarea
 DATA_DIR = Path("./data") / "app_data"
 MAX_TOKENS = 4096
 RETRIEVAL_OPTIONS_LIST = [
-    "None",
+    "Rori + Pre-algebra textbook",
     "Rori micro-lessons only",
     "Pre-algebra textbook only",
-    "Rori + Pre-algebra textbook",
+    "None",
 ]
 SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
 STUDENT_QUERY_SELECTION_STRING = "(Choose a student question from MathNation)"
@@ -78,6 +78,16 @@ def process_user_query(user_query: str):
 
         with st.spinner(""):
             messages = st.session_state.prompt_manager.build_query(user_query)
+            if st.session_state.show_expert_controls:
+                slot_fill_dict = st.session_state.prompt_manager.most_recent_slot_fill_dict
+                # currently, we only show the retrieved texts until the next page reload
+                with st.expander("Retrieved texts:"):
+                    s = ""
+                    for key, value in slot_fill_dict.items():
+                        if value == "":
+                            value = "(none)"
+                        s += "#### " + key + ":\n\n" + value.replace("\n", "\n\n") + "\n\n\n"
+                    st.markdown(s)
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0613",
                 messages=messages,
@@ -95,7 +105,7 @@ def process_user_query(user_query: str):
             elif char == " ":
                 time.sleep(0.04)
             else:
-                time.sleep(0.005)
+                time.sleep(0.004)
             message_placeholder.markdown(displayed_message + "▌")
         message_placeholder.markdown(displayed_message)
 
@@ -153,6 +163,9 @@ for key_name, default_value in setting_defaults.items():
     if key_name not in st.session_state:
         st.session_state[key_name] = default_value
 
+if "prompt_manager" not in st.session_state:
+    st.session_state.prompt_manager = prompt_utils.PromptManager()
+
 query_params = st.experimental_get_query_params()
 if "show_expert_controls" in query_params:
     if query_params["show_expert_controls"][0].lower() == "true":
@@ -202,12 +215,12 @@ if "retrieval_db_map" not in st.session_state:
         rori_microlesson_db_info = {
             "db": st.session_state.retrieval_db_map["rori_microlesson"],
             "max_tokens": 2000,
-            "prefix": "Here is some lesson content that might be relevant:",
+            "prefix": "Here is some lesson content that might be relevant:\n",
         }
         openstax_subsection_db_info = {
             "db": st.session_state.retrieval_db_map["openstax_subsection"],
             "max_tokens": 2000,
-            "prefix": "Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:",
+            "prefix": "Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
         }
         rori_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
             {
@@ -230,10 +243,10 @@ if "retrieval_db_map" not in st.session_state:
             },
         )
         retrieval_options_map = {}
-        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]] = retrieval_strategies.NoRetrievalStrategy()
+        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[3]] = retrieval_strategies.NoRetrievalStrategy()
         retrieval_options_map[RETRIEVAL_OPTIONS_LIST[1]] = rori_only_strategy
         retrieval_options_map[RETRIEVAL_OPTIONS_LIST[2]] = openstax_only_strategy
-        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[3]] = both_strategy
+        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]] = both_strategy
         st.session_state.retrieval_options_map = retrieval_options_map
     else:
         # failed to load data, so can't do retrieval
@@ -242,11 +255,11 @@ if "retrieval_db_map" not in st.session_state:
             key: retrieval_strategies.NoRetrievalStrategy() for key in RETRIEVAL_OPTIONS_LIST
         }
     st.session_state.retrieval_strategy = st.session_state.retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]]
+    st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
 
-if "prompt_manager" not in st.session_state:
-    st.session_state.prompt_manager = prompt_utils.PromptManager()
-
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+if "is_openai_key_set" not in st.session_state or not st.session_state.is_openai_key_set:
+    openai.api_key = st.secrets["OPENAI_API_KEY"]
+    st.session_state.is_openai_key_set = True
 
 
 def build_app():
