@@ -2701,7 +2701,7 @@ files = [
 name = "mpmath"
 version = "1.3.0"
 description = "Python library for arbitrary-precision floating-point arithmetic"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 files = [
@@ -3078,7 +3078,7 @@ files = [
 name = "networkx"
 version = "3.1"
 description = "Python package for creating and manipulating graphs and networks"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
@@ -5418,7 +5418,7 @@ snowflake = ["snowflake-snowpark-python"]
 name = "sympy"
 version = "1.12"
 description = "Computer algebra system (CAS) in Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
@@ -5737,7 +5737,7 @@ files = [
 name = "torch"
 version = "2.0.1"
 description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.8.0"
 files = [
@@ -6379,4 +6379,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "2beadf69257e66cb84934765bbdd037962c5277962e890b90446592bd2cb61de"
+content-hash = "ee804b5d385fbe6a50506f6e8b9f976afd1b58d27d60f252167da35a368a0ac9"

@@ -25,7 +25,6 @@ tiktoken = "^0.4.0"
 httpx = "^0.24.1"
 scipy = "^1.11.0"
 scikit-learn = "^1.2.2"
-torch = "^2.0.1"
 beautifulsoup4 = "^4.12.2"
 
 [tool.poetry.group.dev.dependencies]
@@ -39,6 +38,7 @@ pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
 jupyterlab = "^4.0.2"
 pytest-dotenv = "^0.5.2"
+torch = "^2.0.1"
 
 [tool.poetry.group.anserini]
 optional = true
