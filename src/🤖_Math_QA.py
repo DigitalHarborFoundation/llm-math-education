@@ -2,24 +2,16 @@ import locale
 import logging
 import time
 from datetime import datetime
-from pathlib import Path
 
 import openai
 import pandas as pd
 import streamlit as st
 
-from llm_math_education import prompt_utils, retrieval, retrieval_strategies
+from llm_math_education import prompt_utils
 from llm_math_education.prompts import mathqa
-from streamlit_app import auth_utils, custom_textarea
+from streamlit_app import auth_utils, chat_utils, custom_textarea, data_utils
 
-DATA_DIR = Path("./data") / "app_data"
 MAX_TOKENS = 4096
-RETRIEVAL_OPTIONS_LIST = [
-    "Rori + Pre-algebra textbook",
-    "Rori micro-lessons only",
-    "Pre-algebra textbook only",
-    "None",
-]
 SAMPLE_QUERY_CATEGORIES = ["Algebra", "Geometry"]
 STUDENT_QUERY_SELECTION_STRING = "(Choose a student question from MathNation)"
 
@@ -31,14 +23,6 @@ def get_header_message() -> dict[str, object]:
         "content": "Hi there! I'm here to help you with any math questions you have! What's your question?",
         "timestamp": int(datetime.now().timestamp()),
     }
-
-
-def get_avatar(role: str) -> str | None:
-    if role == "user":
-        return "🧑‍🎓"
-    elif role == "assistant":
-        return "🤖"
-    return None
 
 
 def restart_chat_session():
@@ -55,7 +39,6 @@ def session_restart_button_clicked():
 def student_query_selectbox_changed():
     if st.session_state.student_query_selectbox != STUDENT_QUERY_SELECTION_STRING:
         st.session_state.student_query_selectbox_new_value = st.session_state.student_query_selectbox
-        # st.session_state.student_query_selectbox = STUDENT_QUERY_SELECTION_STRING
         # TODO might want to restart the current session here...
 
 
@@ -68,10 +51,10 @@ def process_user_query(user_query: str):
     st.session_state.chat_messages.append(user_message)
 
     # display user's new query
-    with st.chat_message("user", avatar=get_avatar("user")):
+    with st.chat_message("user", avatar=chat_utils.get_avatar("user")):
         st.markdown(user_query)
 
-    with st.chat_message("assistant", avatar=get_avatar("assistant")):
+    with st.chat_message("assistant", avatar=chat_utils.get_avatar("assistant")):
         message_placeholder = st.empty()
         displayed_message = ""
 
@@ -102,7 +85,7 @@ def process_user_query(user_query: str):
             if char == "\n":
                 time.sleep(0.06)
             elif char == " ":
-                time.sleep(0.04)
+                time.sleep(0.03)
             else:
                 time.sleep(0.004)
             message_placeholder.markdown(displayed_message + "▌")
@@ -133,118 +116,66 @@ def update_retrieval_setting():
     st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
 
 
-# settings
-setting_defaults = {
-    "temperature": 1.0,
-    "temperature_text_input": "1.0",
-    "temperature_text_input_valid": True,
-    "retrieval_radio": RETRIEVAL_OPTIONS_LIST[0],
-    "student_query_selectbox_new_value": None,
-    "show_expert_controls": False,
-}
-# initialize all values in the settings dict
-# (happens only on the first run each session)
-for key_name, default_value in setting_defaults.items():
-    if key_name not in st.session_state:
-        st.session_state[key_name] = default_value
+def instantiate_session():
+    # settings
+    setting_defaults = {
+        "temperature": 1.0,
+        "temperature_text_input": "1.0",
+        "temperature_text_input_valid": True,
+        "retrieval_radio": data_utils.RETRIEVAL_OPTIONS_LIST[0],
+        "student_query_selectbox_new_value": None,
+        "show_expert_controls": False,
+    }
+    # initialize all values in the settings dict
+    # (happens only on the first run each session)
+    for key_name, default_value in setting_defaults.items():
+        if key_name not in st.session_state:
+            st.session_state[key_name] = default_value
 
-if "prompt_manager" not in st.session_state:
-    st.session_state.prompt_manager = prompt_utils.PromptManager()
+    if "prompt_manager" not in st.session_state:
+        st.session_state.prompt_manager = prompt_utils.PromptManager()
 
-query_params = st.experimental_get_query_params()
-if "show_expert_controls" in query_params:
-    if query_params["show_expert_controls"][0].lower() == "true":
-        st.session_state.show_expert_controls = True
+    query_params = st.experimental_get_query_params()
+    if "show_expert_controls" in query_params:
+        if query_params["show_expert_controls"][0].lower() == "true":
+            st.session_state.show_expert_controls = True
 
-if "student_queries" not in st.session_state:
-    # load the student question data
-    if DATA_DIR.exists():
-        mn_general_student_queries_filepath = DATA_DIR / "mn_general_student_queries.csv"
-        query_df = pd.read_csv(mn_general_student_queries_filepath)
-        st.session_state["student_queries"] = [
-            {
-                "category": "Geometry" if row.subject_name == "Geometry" else "Algebra",
-                "query": row.post_content.strip().replace("[Continued:]", "\n"),
-            }
-            for row in query_df.sample(frac=1, random_state=87896).itertuples()
-            if row.is_respondable_query == "general"
-        ]
-        st.session_state["student_queries"].insert(
-            0,
-            {
-                "category": None,
-                "query": STUDENT_QUERY_SELECTION_STRING,
-            },
-        )
-    else:
-        st.session_state["student_queries"] = [
-            {
-                "category": None,
-                "query": "(Failed to load student questions.)",
-            },
-        ]
-# load dbs for retrieval
-if "retrieval_db_map" not in st.session_state:
-    st.session_state.retrieval_db_map = {}
-    if DATA_DIR.exists():
-        loading_error = False
-        for db_name in ["rori_microlesson", "openstax_subsection"]:
-            try:
-                db = retrieval.RetrievalDb(DATA_DIR, db_name, "db_string")
-                st.session_state.retrieval_db_map[db_name] = db
-            except Exception:
-                logging.warning(f"Failed to load db {db_name}.")
-                loading_error = True
-                continue
-        # TODO determine what to do if a loading error occurs
-        rori_microlesson_db_info = {
-            "db": st.session_state.retrieval_db_map["rori_microlesson"],
-            "max_tokens": 2000,
-            "prefix": "Here is some lesson content that might be relevant:\n",
-        }
-        openstax_subsection_db_info = {
-            "db": st.session_state.retrieval_db_map["openstax_subsection"],
-            "max_tokens": 2000,
-            "prefix": "Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
-        }
-        rori_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
-            {
-                "rori_microlesson_texts": rori_microlesson_db_info,
-            },
-        )
-        openstax_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
-            {
-                "openstax_subsection_texts": openstax_subsection_db_info,
-            },
-        )
-        rori_microlesson_db_info = rori_microlesson_db_info.copy()
-        openstax_subsection_db_info = openstax_subsection_db_info.copy()
-        rori_microlesson_db_info["max_tokens"] /= 2
-        openstax_subsection_db_info["max_tokens"] /= 2
-        both_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
-            {
-                "rori_microlesson_texts": rori_microlesson_db_info,
-                "openstax_subsection_texts": openstax_subsection_db_info,
-            },
-        )
-        retrieval_options_map = {}
-        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[3]] = retrieval_strategies.NoRetrievalStrategy()
-        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[1]] = rori_only_strategy
-        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[2]] = openstax_only_strategy
-        retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]] = both_strategy
-        st.session_state.retrieval_options_map = retrieval_options_map
-    else:
-        # failed to load data, so can't do retrieval
-        # TODO warn the user that loading retrieval dbs failed
-        st.session_state.retrieval_options_map = {
-            key: retrieval_strategies.NoRetrievalStrategy() for key in RETRIEVAL_OPTIONS_LIST
-        }
-    st.session_state.retrieval_strategy = st.session_state.retrieval_options_map[RETRIEVAL_OPTIONS_LIST[0]]
-    st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
+    if "student_queries" not in st.session_state:
+        # load the student question data
+        if data_utils.DATA_DIR.exists():
+            mn_general_student_queries_filepath = data_utils.DATA_DIR / "mn_general_student_queries.csv"
+            query_df = pd.read_csv(mn_general_student_queries_filepath)
+            st.session_state["student_queries"] = [
+                {
+                    "category": "Geometry" if row.subject_name == "Geometry" else "Algebra",
+                    "query": row.post_content.strip().replace("[Continued:]", "\n"),
+                }
+                for row in query_df.sample(frac=1, random_state=87896).itertuples()
+                if row.is_respondable_query == "general"
+            ]
+            st.session_state["student_queries"].insert(
+                0,
+                {
+                    "category": None,
+                    "query": STUDENT_QUERY_SELECTION_STRING,
+                },
+            )
+        else:
+            st.session_state["student_queries"] = [
+                {
+                    "category": None,
+                    "query": "(Failed to load student questions.)",
+                },
+            ]
+    # load dbs for retrieval
+    was_data_loaded = data_utils.load_session_data()
+    if was_data_loaded:
+        st.session_state.retrieval_strategy = next(iter(st.session_state.retrieval_options_map.values()))
+        st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)
 
-if "is_openai_key_set" not in st.session_state or not st.session_state.is_openai_key_set:
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
-    st.session_state.is_openai_key_set = True
+    if "is_openai_key_set" not in st.session_state or not st.session_state.is_openai_key_set:
+        openai.api_key = st.secrets["OPENAI_API_KEY"]
+        st.session_state.is_openai_key_set = True
 
 
 def build_app():
@@ -308,7 +239,7 @@ After each query, the associated prompt is included in a drop-down (including an
         st.session_state.chat_messages = [get_header_message()]
 
     for message in st.session_state.chat_messages:
-        with st.chat_message(message["role"], avatar=get_avatar(message["role"])):
+        with st.chat_message(message["role"], avatar=chat_utils.get_avatar(message["role"])):
             st.markdown(message["content"])
 
     new_chat_input_value = st.chat_input(
@@ -350,7 +281,7 @@ After each query, the associated prompt is included in a drop-down (including an
 
                 st.radio(
                     "Retrieval:",
-                    RETRIEVAL_OPTIONS_LIST,
+                    data_utils.RETRIEVAL_OPTIONS_LIST,
                     key="retrieval_radio",
                     on_change=update_retrieval_setting,
                 )
@@ -358,4 +289,5 @@ After each query, the associated prompt is included in a drop-down (including an
 
 st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
 if auth_utils.check_is_authorized():
+    instantiate_session()
     build_app()
