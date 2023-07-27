@@ -7,7 +7,7 @@ def build_app():
     st.markdown(
         """# Hint generation
 
-Not yet implemented""",
+Coming soon.""",
     )
 
 
