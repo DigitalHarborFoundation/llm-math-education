@@ -8,7 +8,9 @@ st.set_page_config(
 st.markdown(
     """# About this app
 
+This Streamlit app is a demo that applies OpenAI's ChatGPT to provide math conversation and problem-solving hints to students.
 
+The core technical approach is to use ["retrieval augmented generation"](https://www.promptingguide.ai/techniques/rag) to improve the relevance of the responses to middle-school math students.
 
 #### People
 
