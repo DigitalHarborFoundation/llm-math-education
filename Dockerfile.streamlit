@@ -1,17 +1,21 @@
 FROM python:3.10
 
 RUN python -m pip install --upgrade pip
+RUN curl -sSL https://install.python-poetry.org | python -
 
 WORKDIR /usr/app
-COPY ./streamlit-requirements.txt ./requirements.txt
-RUN pip install -r requirements.txt
+#COPY ./streamlit-requirements.txt ./requirements.txt
+#RUN pip install -r requirements.txt
 
 COPY ./src ./src
 COPY ./tests ./tests
 COPY ./data/app_data ./data/app_data
 
-COPY ./dist ./dist
-RUN pip install ./dist/*.whl
+# note: README.md is required for Poetry
+COPY README.md README.md
+COPY pyproject.toml pyproject.toml
+COPY poetry.lock poetry.lock
+RUN pip install .
 
 EXPOSE 8502
 ENTRYPOINT ["streamlit", "run", "src/🤖_Math_QA.py", "--server.port=8502", "--server.address=0.0.0.0"]
