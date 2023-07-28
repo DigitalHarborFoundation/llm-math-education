@@ -33,7 +33,7 @@ test:
 
 build-docker:
 	@poetry build
-	@poetry export --without-hashes --format=requirements.txt > streamlit-requirements.txt
+	#@poetry export --without-hashes --format=requirements.txt > streamlit-requirements.txt
 	@docker build -t rori_streamlit -f Dockerfile.streamlit .
 
 run-docker:

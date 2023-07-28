@@ -1,15 +1,15 @@
 name: Build and push streamlit container
 on:
   push:
-    branches: [release]
+    branches: [main]
 jobs:
   build-container:
     name: Build image
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_ID: legible-labs-mockingbird
-      ARTIFACT_REPOSITORY: legible-labs-containers
+      PROJECT_ID: rori-turn
+      ARTIFACT_REPOSITORY: rori-docker-containers
       IMAGE_NAME: llm-math-education-streamlit
       TAG: latest
 
@@ -28,11 +28,11 @@ jobs:
       - name: Build Image
         run: |
           docker build -t local_container -f Dockerfile.streamlit .
-          docker tag local_container us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker tag local_container europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
       # Configure docker to use the gcloud command-line tool as a credential helper
       - run: |
-          gcloud auth configure-docker us-east1-docker.pkg.dev -q
+          gcloud auth configure-docker europe-west1-docker.pkg.dev -q
       # Push image to Google Container Registry
       - name: Push Image
         run: |
-          docker push us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker push europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
