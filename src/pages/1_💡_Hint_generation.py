@@ -16,9 +16,16 @@ HINT_TYPE_BUTTON_LABELS_MAP = {
 
 
 def question_selectbox_changed():
-    if st.session_state.question_selectbox_changed != QUESTION_SELECTBOX_DEFAULT_STRING:
-        st.session_state.question_selectbox_new_value = st.session_state.question_selectbox
-        # TODO also set the corresponding correct and incorrect answers
+    if st.session_state.question_selectbox != QUESTION_SELECTBOX_DEFAULT_STRING:
+        display_name = st.session_state.question_selectbox
+        question_df = data_utils.load_hint_problem_data()
+        selected = question_df[question_df.display_name == display_name]
+        assert len(selected) == 1
+        selected = selected.iloc[0]
+        st.session_state.question_text_area = selected.question
+        st.session_state.incorrect_answer_text_input = selected.incorrect_answer
+        st.session_state.correct_answer_text_input = selected.answer
+        st.session_state.lesson_text_area = selected.lesson_trimmed
 
 
 def hint_chat_input_changed():
@@ -34,8 +41,13 @@ def create_new_hint(hint_type: str):
         message_placeholder = st.empty()
 
         with st.spinner(""):
-            user_query = hint_type  # TODO actually do this
             st.session_state.hint_prompt_manager.clear_stored_messages()
+            correct_answer = st.session_state.correct_answer_text_input.strip()
+            incorrect_answer = st.session_state.incorrect_answer_text_input.strip()
+            question = st.session_state.question_text_area.strip()
+            lesson = st.session_state.lesson_text_area.strip()
+            # TODO build query correctly
+            user_query = lesson + question + correct_answer + incorrect_answer
             messages = st.session_state.hint_prompt_manager.build_query(user_query)
             # TODO show the generated prompt if expert controls enabled
 
@@ -91,7 +103,6 @@ def instantiate_session():
     setting_defaults = {
         "hint_type_button_new_value": None,
         "hint_chat_input_new_value": None,
-        "question_selectbox_new_value": None,
         "show_expert_controls": False,
     }
     # initialize all values in the settings dict
@@ -120,22 +131,48 @@ def build_app():
     st.markdown(
         """# Hint generation
 
-Generate hints for problems given an incorrect answer.""",
+Generate hints for practice problems given an incorrect answer.""",
     )
+    question_df = data_utils.load_hint_problem_data()
     st.selectbox(
         "Choose a practice problem:",
-        ["Practice problem! What is x + 5?"],
+        [QUESTION_SELECTBOX_DEFAULT_STRING] + question_df.display_name.to_list(),
         key="question_selectbox",
         on_change=question_selectbox_changed,
     )
-    st.text_input(
-        "Student's incorrect answer:",
-        key="incorrect_answer_text_input",
+    with st.expander("Lesson and worked example"):
+        st.text_area(
+            "Lesson and worked example text:",
+            key="lesson_text_area",
+            label_visibility="collapsed",
+        )
+    st.text_area(
+        "Practice problem:",
+        key="question_text_area",
     )
-    st.text_input(
-        "Correct answer:",
-        key="correct_answer_text_input",
+    c1, c2 = st.columns(2)
+    with c1:
+        st.text_input(
+            "Student's incorrect answer:",
+            key="incorrect_answer_text_input",
+        )
+    with c2:
+        st.text_input(
+            "Correct answer:",
+            key="correct_answer_text_input",
+        )
+    are_buttons_enabled = (
+        st.session_state.correct_answer_text_input.strip() != ""
+        and st.session_state.incorrect_answer_text_input.strip() != ""
+        and st.session_state.question_text_area.strip() != ""
     )
+    if not are_buttons_enabled:
+        st.warning(
+            f"Select a practice problem above, then choose one of {len(HINT_TYPE_BUTTON_LABELS_MAP)} hint types.",
+        )
+    elif st.session_state.correct_answer_text_input.strip() == st.session_state.incorrect_answer_text_input.strip():
+        st.warning("To generate a hint, the student's answer can't match the correct answer.")
+        are_buttons_enabled = False
     with st.container():
         for hint_type, button_label in HINT_TYPE_BUTTON_LABELS_MAP.items():
             st.button(
@@ -143,6 +180,7 @@ Generate hints for problems given an incorrect answer.""",
                 key=f"{hint_type}_button",
                 on_click=hint_type_button_clicked,
                 args=(hint_type,),
+                disabled=not are_buttons_enabled,
             )
 
     # initialize history
