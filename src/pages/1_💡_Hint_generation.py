@@ -47,7 +47,7 @@ def create_new_hint(hint_type: str):
             question = st.session_state.question_text_area.strip()
             lesson = st.session_state.lesson_text_area.strip()
             # TODO build query correctly
-            user_query = lesson + question + correct_answer + incorrect_answer
+            user_query = lesson + question + correct_answer + incorrect_answer + hint_type
             messages = st.session_state.hint_prompt_manager.build_query(user_query)
             # TODO show the generated prompt if expert controls enabled
 

@@ -15,6 +15,42 @@ If the student says something inappropriate or off topic you will say you can on
             },
         ],
     },
+    "slip_correction": {
+        "pretty_name": "Slip correction",
+        "messages": [
+            {
+                "role": "system",
+                "content": """You are an expert mathematics tutor who gives useful hints for middle-school students.
+
+The following paragraphs are examples of content that may or not be relevant in helping the student write a hint.
+{rori_microlesson_texts}
+{openstax_subsection_texts}""",
+            },
+            {
+                "role": "user",
+                "content": """
+""",
+            },
+        ],
+    },
+    "misconception": {
+        "pretty_name": "Misconception-based hint",
+        "messages": [
+            {
+                "role": "system",
+                "content": """""",
+            },
+        ],
+    },
+    "comparative_hint": {
+        "pretty_name": "Comparative hint",
+        "messages": [
+            {
+                "role": "system",
+                "content": """""",
+            },
+        ],
+    },
 }
 
 misconception_identification = {
