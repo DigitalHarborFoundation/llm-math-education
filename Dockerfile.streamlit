@@ -4,8 +4,6 @@ RUN python -m pip install --upgrade pip
 RUN curl -sSL https://install.python-poetry.org | python -
 
 WORKDIR /usr/app
-#COPY ./streamlit-requirements.txt ./requirements.txt
-#RUN pip install -r requirements.txt
 
 COPY ./src ./src
 COPY ./tests ./tests

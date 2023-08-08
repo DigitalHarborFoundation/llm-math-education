@@ -16,3 +16,23 @@ If the student says something inappropriate or off topic you will say you can on
         ],
     },
 }
+
+misconception_identification = {
+    "creature_ai": {
+        "pretty_name": "Nancy Otero's misconception identification prompt",
+        "messages": [
+            {
+                "role": "user",
+                "content": """I’ll give you a spreadsheet with a list of MaEs. Each MaE has an ID, an explanation of the MaE, and 4 examples of the MaE.
+                Then I'll show you a student incorrect answer to a math question.
+                I want you to tell me how many of the {mae_count} MaEs you can identify in the answers, identify as many as you can.
+                  Please process the answer and tell me:
+ If the answer is correct
+ If the answer is not correct: how many MaEs can you identify? Which ones and why?
+ Spreadsheet:
+ {mae_spreadsheet_string}
+""",
+            },
+        ],
+    },
+}
