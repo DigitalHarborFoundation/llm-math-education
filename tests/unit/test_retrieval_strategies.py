@@ -49,3 +49,7 @@ def test_MappedEmbeddingRetrievalStrategy(retrieval_db_path):
     filled_slots = retriever.do_retrieval(["slot1", "slot2"], "")
     assert filled_slots["slot1"] == "fill1"
     assert filled_slots["slot2"].startswith("Test text")
+
+    retriever.update_map({"slot2": "fill2"})
+    filled_slots = retriever.do_retrieval(["slot1", "slot2"], "")
+    assert filled_slots["slot2"] == "fill2"
