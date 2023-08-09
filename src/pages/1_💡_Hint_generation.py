@@ -1,5 +1,3 @@
-import time
-
 import openai
 import streamlit as st
 
@@ -34,42 +32,26 @@ def hint_chat_input_changed():
 
 
 def hint_type_button_clicked(hint_type: str):
-    st.session_state.hint_type_button_new_value = hint_type
+    create_new_hint(hint_type)
 
 
-def create_new_hint(hint_type: str):
+def process_hint_query(messages: list[dict]):
+    # show the generated prompt if expert controls enabled
+    if st.session_state.show_expert_controls:
+        with st.expander("Prompt"):
+            prompt = prompt_utils.PromptSelector.convert_conversation_to_string(
+                st.session_state.hint_prompt_manager.stored_messages,
+            )
+            prompt = prompt.replace("\n", "\n\n")
+            st.markdown(prompt)
     with st.chat_message("assistant", avatar=chat_utils.get_avatar("assistant")):
         message_placeholder = st.empty()
-
         with st.spinner(""):
-            st.session_state.hint_prompt_manager.clear_stored_messages()
-            correct_answer = st.session_state.correct_answer_text_input.strip()
-            incorrect_answer = st.session_state.incorrect_answer_text_input.strip()
-            question = st.session_state.question_text_area.strip()
-            lesson = st.session_state.lesson_text_area.strip()
-            st.session_state.hint_prompt_manager.get_retrieval_strategy().update_map(
-                {
-                    "question": question,
-                    "correct_answer": correct_answer,
-                    "incorrect_answer": incorrect_answer,
-                    "lesson": lesson,
-                },
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0613",
+                messages=messages,
             )
-            intro_messages = hint_prompts.intro_prompts[hint_type]["messages"]
-            st.session_state.hint_prompt_manager.set_intro_messages(intro_messages)
-            messages = st.session_state.hint_prompt_manager.build_query(None)
-            # TODO show the generated prompt if expert controls enabled
-
-            # completion = openai.ChatCompletion.create(
-            #    model="gpt-3.5-turbo-0613",
-            #    messages=messages,
-            # )
-            # assistant_message = completion["choices"][0]["message"]
-            time.sleep(0.4)  # imitate API delay
-            assistant_message = {
-                "role": "assistant",
-                "content": f"Generated a {hint_type} hint from {len(messages)} messages",
-            }
+            assistant_message = completion["choices"][0]["message"]
             assert "role" in assistant_message and "content" in assistant_message
             st.session_state.hint_prompt_manager.add_stored_message(assistant_message)
         response = assistant_message["content"]
@@ -77,6 +59,27 @@ def create_new_hint(hint_type: str):
             message_placeholder.markdown(displayed_message)
 
         st.session_state.hint_chat_messages.append(assistant_message)
+
+
+def create_new_hint(hint_type: str):
+    st.session_state.hint_chat_messages = []
+    st.session_state.hint_prompt_manager.clear_stored_messages()
+    correct_answer = st.session_state.correct_answer_text_input.strip()
+    incorrect_answer = st.session_state.incorrect_answer_text_input.strip()
+    question = st.session_state.question_text_area.strip()
+    lesson = st.session_state.lesson_text_area.strip()
+    st.session_state.hint_prompt_manager.get_retrieval_strategy().update_map(
+        {
+            "question": question,
+            "correct_answer": correct_answer,
+            "incorrect_answer": incorrect_answer,
+            "lesson": lesson,
+        },
+    )
+    intro_messages = hint_prompts.intro_prompts[hint_type]["messages"]
+    st.session_state.hint_prompt_manager.set_intro_messages(intro_messages)
+    messages = st.session_state.hint_prompt_manager.build_query(None)
+    st.session_state.new_hint_request_messages = messages
 
 
 def process_followup_query(user_query: str):
@@ -110,7 +113,7 @@ def process_followup_query(user_query: str):
 def instantiate_session():
     # settings
     setting_defaults = {
-        "hint_type_button_new_value": None,
+        "new_hint_request_messages": None,
         "hint_chat_input_new_value": None,
         "show_expert_controls": False,
     }
@@ -182,28 +185,27 @@ Generate hints for practice problems given an incorrect answer.""",
     elif st.session_state.correct_answer_text_input.strip() == st.session_state.incorrect_answer_text_input.strip():
         st.warning("To generate a hint, the student's answer can't match the correct answer.")
         are_buttons_enabled = False
-    with st.container():
-        for hint_type, button_label in HINT_TYPE_BUTTON_LABELS_MAP.items():
-            st.button(
-                button_label,
-                key=f"{hint_type}_button",
-                on_click=hint_type_button_clicked,
-                args=(hint_type,),
-                disabled=not are_buttons_enabled,
-            )
+    # add the hint buttons
+    for hint_type, button_label in HINT_TYPE_BUTTON_LABELS_MAP.items():
+        st.button(
+            button_label,
+            key=f"{hint_type}_button",
+            on_click=hint_type_button_clicked,
+            args=(hint_type,),
+            disabled=not are_buttons_enabled,
+        )
 
-    # initialize history
     if "hint_chat_messages" not in st.session_state:
         st.session_state.hint_chat_messages = []
 
+    # replay history, if there is any
     for message in st.session_state.hint_chat_messages:
         with st.chat_message(message["role"], avatar=chat_utils.get_avatar(message["role"])):
             st.markdown(message["content"])
 
-    if st.session_state.hint_type_button_new_value is not None:
-        hint_type = st.session_state.hint_type_button_new_value
-        st.session_state.hint_type_button_new_value = None
-        create_new_hint(hint_type)
+    if st.session_state.new_hint_request_messages is not None:
+        process_hint_query(st.session_state.new_hint_request_messages)
+        st.session_state.new_hint_request_messages = None
     elif st.session_state.hint_chat_input_new_value is not None:
         user_query = st.session_state.hint_chat_input_new_value
         st.session_state.hint_chat_input_new_value = None

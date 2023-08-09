@@ -104,6 +104,11 @@ def normalize_text(text: str) -> str:
 
 
 class DbInfo:
+    """Wrapper class with info about how retrieved texts should be incorporated in a prompt.
+
+    See `prompt_utils.PromptManager`.
+    """
+
     def __init__(self, db: RetrievalDb, max_tokens: int = 1000, prefix: str = "", suffix: str = ""):
         self.db = db
         self.max_tokens = max_tokens
