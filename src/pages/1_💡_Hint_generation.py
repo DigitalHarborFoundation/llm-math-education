@@ -3,7 +3,8 @@ import time
 import openai
 import streamlit as st
 
-from llm_math_education import prompt_utils
+from llm_math_education import prompt_utils, retrieval_strategies
+from llm_math_education.prompts import hints as hint_prompts
 from streamlit_app import auth_utils, chat_utils, data_utils
 
 QUESTION_SELECTBOX_DEFAULT_STRING = "(Choose a question from a Rori micro-lesson)"
@@ -46,9 +47,17 @@ def create_new_hint(hint_type: str):
             incorrect_answer = st.session_state.incorrect_answer_text_input.strip()
             question = st.session_state.question_text_area.strip()
             lesson = st.session_state.lesson_text_area.strip()
-            # TODO build query correctly
-            user_query = lesson + question + correct_answer + incorrect_answer + hint_type
-            messages = st.session_state.hint_prompt_manager.build_query(user_query)
+            st.session_state.hint_prompt_manager.get_retrieval_strategy().update_map(
+                {
+                    "question": question,
+                    "correct_answer": correct_answer,
+                    "incorrect_answer": incorrect_answer,
+                    "lesson": lesson,
+                },
+            )
+            intro_messages = hint_prompts.intro_prompts[hint_type]["messages"]
+            st.session_state.hint_prompt_manager.set_intro_messages(intro_messages)
+            messages = st.session_state.hint_prompt_manager.build_query(None)
             # TODO show the generated prompt if expert controls enabled
 
             # completion = openai.ChatCompletion.create(
@@ -113,9 +122,9 @@ def instantiate_session():
 
     if "hint_prompt_manager" not in st.session_state:
         st.session_state.hint_prompt_manager = prompt_utils.PromptManager()
-        data_utils.load_session_data()
-        default_retrieval_strategy = next(iter(st.session_state.retrieval_options_map.values()))
-        st.session_state.hint_prompt_manager.set_retrieval_strategy(default_retrieval_strategy)
+        slot_map = data_utils.create_hint_default_retrieval_slot_map()
+        retrieval_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map)
+        st.session_state.hint_prompt_manager.set_retrieval_strategy(retrieval_strategy)
 
     query_params = st.experimental_get_query_params()
     if "show_expert_controls" in query_params:

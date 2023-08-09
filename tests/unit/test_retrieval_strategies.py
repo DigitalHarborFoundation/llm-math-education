@@ -25,7 +25,7 @@ def test_EmbeddingRetrievalStrategy(retrieval_db_path):
     assert filled_slots["testSlot"] == ""
 
 
-def test_MappedEmbeddingRetrievalStrategy(retrieval_db_path):
+def test_MappedEmbeddingRetrievalStrategy(retrieval_db):
     slot_map = {
         "slot1": "fill1",
         "slot2": "fill2",
@@ -38,12 +38,9 @@ def test_MappedEmbeddingRetrievalStrategy(retrieval_db_path):
     for slot, slot_fill in slot_map.items():
         assert filled_slots[slot] == slot_fill
 
-    db = retrieval.RetrievalDb(retrieval_db_path, "conftestDb", "text")
     slot_map = {
         "slot1": "fill1",
-        "slot2": {
-            "db": db,
-        },
+        "slot2": retrieval.DbInfo(retrieval_db),
     }
     retriever = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map)
     filled_slots = retriever.do_retrieval(["slot1", "slot2"], "")

@@ -46,7 +46,7 @@ class EmbeddingRetrievalStrategy(RetrievalStrategy):
 
 
 class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
-    def __init__(self, slot_map: dict[str, str | dict], nonmatching_fill: str = "") -> None:
+    def __init__(self, slot_map: dict[str, str | retrieval.DbInfo], nonmatching_fill: str = "") -> None:
         super().__init__()
         self.slot_map = slot_map
         self.nonmatching_fill = nonmatching_fill
@@ -56,10 +56,10 @@ class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
         for key, value in self.slot_map.items():
             if type(key) is not str:
                 raise ValueError("Slot map keys must be strings.")
-            if type(value) not in [dict, str]:
+            if type(value) not in [str, retrieval.DbInfo]:
                 raise ValueError("Unexpected type in slot map.")
-            if type(value) is dict:
-                if "db" not in value or not hasattr(value["db"], "compute_string_distances"):
+            if type(value) is retrieval.DbInfo:
+                if not hasattr(value.db, "compute_string_distances"):
                     raise ValueError("Expected a db with a compute_string_distances() method.")
 
     def update_map(self, slot_updates: dict):
@@ -74,8 +74,7 @@ class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
                 if type(db_info) is str:
                     fill_string = db_info
                 else:
-                    db = db_info["db"]
-                    max_tokens = db_info["max_tokens"] if "max_tokens" in db_info else 1500
+                    db = db_info.db
                     distances = db.compute_string_distances(user_query)
                     sort_inds = retrieval.get_distance_sort_indices(distances)
                     texts = []
@@ -83,14 +82,12 @@ class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
                     for ind in sort_inds:
                         row = db.df.iloc[ind]
                         n_tokens = row[db.n_tokens_col]
-                        if total_tokens + n_tokens > max_tokens:
+                        if total_tokens + n_tokens > db_info.max_tokens:
                             break
                         total_tokens += n_tokens
                         text = row[db.embed_col]
                         texts.append(text)
-                    prefix = db_info["prefix"] if "prefix" in db_info else ""
-                    suffix = db_info["suffix"] if "suffix" in db_info else ""
-                    fill_string = prefix + "\n".join(texts) + suffix
+                    fill_string = db_info.prefix + "\n".join(texts) + db_info.suffix
             else:
                 fill_string = self.nonmatching_fill
             fill_string_map[expected_slot] = fill_string

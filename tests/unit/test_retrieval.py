@@ -44,3 +44,12 @@ def test_RetrievalDb(tmp_path, monkeypatch):
     # test non-existent db loading
     with pytest.raises(ValueError):
         retrieval.RetrievalDb(tmp_path, "testDb2", "text")
+
+
+def test_DbInfo(retrieval_db):
+    db_info = retrieval.DbInfo(retrieval_db, max_tokens=1)
+    assert db_info.max_tokens == 1
+    db_info2 = db_info.copy()
+    assert db_info2.max_tokens == 1
+    db_info3 = db_info.copy(max_tokens=2)
+    assert db_info3.max_tokens == 2

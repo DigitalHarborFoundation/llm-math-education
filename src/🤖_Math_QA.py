@@ -168,7 +168,7 @@ def instantiate_session():
                 },
             ]
     # load dbs for retrieval
-    was_data_loaded = data_utils.load_session_data()
+    was_data_loaded = data_utils.cache_retrieval_data_in_session()
     if was_data_loaded:
         st.session_state.retrieval_strategy = next(iter(st.session_state.retrieval_options_map.values()))
         st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)

@@ -17,6 +17,7 @@ RETRIEVAL_OPTIONS_LIST = [
 DB_NAME_LIST = ["rori_microlesson", "openstax_subsection"]
 
 
+@st.cache_data
 def create_retrieval_db_map(
     db_name_list: list[str] = DB_NAME_LIST,
     except_on_error: bool = False,
@@ -36,7 +37,27 @@ def create_retrieval_db_map(
     return retrieval_db_map
 
 
-def load_session_data() -> bool:
+@st.cache_data
+def create_hint_default_retrieval_slot_map() -> dict[str, retrieval.DbInfo]:
+    retrieval_db_map = create_retrieval_db_map()
+    rori_microlesson_db_info = retrieval.DbInfo(
+        retrieval_db_map["rori_microlesson"],
+        max_tokens=1000,
+        prefix="Here is some lesson content that might be relevant:\n",
+    )
+    openstax_subsection_db_info = retrieval.DbInfo(
+        retrieval_db_map["openstax_subsection"],
+        max_tokens=1000,
+        prefix="Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
+    )
+    slot_map = {
+        "rori_microlesson_texts": rori_microlesson_db_info,
+        "openstax_subsection_texts": openstax_subsection_db_info,
+    }
+    return slot_map
+
+
+def cache_retrieval_data_in_session() -> bool:
     if "retrieval_db_map" not in st.session_state:
         st.session_state.retrieval_db_map = create_retrieval_db_map()
     was_data_loaded = False
@@ -48,16 +69,16 @@ def load_session_data() -> bool:
                 key: retrieval_strategies.NoRetrievalStrategy() for key in RETRIEVAL_OPTIONS_LIST
             }
         else:
-            rori_microlesson_db_info = {
-                "db": st.session_state.retrieval_db_map["rori_microlesson"],
-                "max_tokens": 2000,
-                "prefix": "Here is some lesson content that might be relevant:\n",
-            }
-            openstax_subsection_db_info = {
-                "db": st.session_state.retrieval_db_map["openstax_subsection"],
-                "max_tokens": 2000,
-                "prefix": "Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
-            }
+            rori_microlesson_db_info = retrieval.DbInfo(
+                st.session_state.retrieval_db_map["rori_microlesson"],
+                max_tokens=2000,
+                prefix="Here is some lesson content that might be relevant:\n",
+            )
+            openstax_subsection_db_info = retrieval.DbInfo(
+                st.session_state.retrieval_db_map["openstax_subsection"],
+                max_tokens=2000,
+                prefix="Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
+            )
             rori_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
                 {
                     "rori_microlesson_texts": rori_microlesson_db_info,
@@ -68,14 +89,10 @@ def load_session_data() -> bool:
                     "openstax_subsection_texts": openstax_subsection_db_info,
                 },
             )
-            rori_microlesson_db_info = rori_microlesson_db_info.copy()
-            openstax_subsection_db_info = openstax_subsection_db_info.copy()
-            rori_microlesson_db_info["max_tokens"] /= 2
-            openstax_subsection_db_info["max_tokens"] /= 2
             both_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
                 {
-                    "rori_microlesson_texts": rori_microlesson_db_info,
-                    "openstax_subsection_texts": openstax_subsection_db_info,
+                    "rori_microlesson_texts": rori_microlesson_db_info.copy(max_tokens=1000),
+                    "openstax_subsection_texts": openstax_subsection_db_info.copy(max_tokens=1000),
                 },
             )
             retrieval_options_map = {

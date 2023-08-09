@@ -36,6 +36,12 @@ def retrieval_db_path(tmp_path, monkeypatch):
     return tmp_path
 
 
+@pytest.fixture
+def retrieval_db(retrieval_db_path) -> retrieval.RetrievalDb:
+    db = retrieval.RetrievalDb(retrieval_db_path, "conftestDb", "text")
+    return db
+
+
 @pytest.fixture(autouse=True)
 def no_openai(monkeypatch):
     """Remove Embedding and ChatCompletion creations during all tests.

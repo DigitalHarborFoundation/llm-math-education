@@ -28,8 +28,11 @@ The following paragraphs are examples of content that may or not be relevant in 
             },
             {
                 "role": "user",
-                "content": """
-""",
+                "content": """Provide a hint for this math question:
+{question}
+
+The correct answer is {correct_answer}, but I answered {incorrect_answer}.
+I think I made a small slip-up. In just one sentence, what did I do wrong?""",
             },
         ],
     },

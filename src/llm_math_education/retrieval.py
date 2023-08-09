@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import collections.abc
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -26,7 +27,7 @@ class RetrievalDb:
         embedding_dir: Path,
         db_name: str,
         embed_col: str,
-        df: Optional[pd.DataFrame] = None,
+        df: pd.DataFrame | None = None,
         n_tokens_col: str = "n_tokens",
     ):
         self.embedding_dir = embedding_dir
@@ -100,3 +101,22 @@ def get_distance_sort_indices(distances: np.array) -> np.array:
 
 def normalize_text(text: str) -> str:
     return text.replace("\n", " ").strip()
+
+
+class DbInfo:
+    def __init__(self, db: RetrievalDb, max_tokens: int = 1000, prefix: str = "", suffix: str = ""):
+        self.db = db
+        self.max_tokens = max_tokens
+        self.prefix = prefix
+        self.suffix = suffix
+
+    def copy(self, **kwargs) -> DbInfo:
+        """Create a copy of this DbInfo, overriding the keyword args with new values if provided.
+
+        Returns:
+            DbInfo: Newly instantiated copy.
+        """
+        for expected_key in ["max_tokens", "prefix", "suffix"]:
+            if expected_key not in kwargs:
+                kwargs[expected_key] = getattr(self, expected_key)
+        return DbInfo(self.db, **kwargs)
