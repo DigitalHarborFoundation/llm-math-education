@@ -109,11 +109,30 @@ class DbInfo:
     See `prompt_utils.PromptManager`.
     """
 
-    def __init__(self, db: RetrievalDb, max_tokens: int = 1000, prefix: str = "", suffix: str = ""):
+    def __init__(
+        self,
+        db: RetrievalDb,
+        max_tokens: int = 1000,
+        max_texts: int = 1000,
+        prefix: str = "",
+        suffix: str = "",
+        join_string: str = "\n",
+        use_parent_text: bool = False,
+        parent_group_cols: list[str] = [],
+        parent_sort_cols: list[str] = [],
+    ):
         self.db = db
         self.max_tokens = max_tokens
+        self.max_texts = max_texts
         self.prefix = prefix
         self.suffix = suffix
+        self.join_string = join_string
+
+        # configure parent retrieval
+        self.use_parent_text = use_parent_text
+        self.parent_join_string = "\n"
+        self.parent_group_cols = parent_group_cols
+        self.parent_sort_cols = parent_sort_cols
 
     def copy(self, **kwargs) -> DbInfo:
         """Create a copy of this DbInfo, overriding the keyword args with new values if provided.
@@ -125,3 +144,61 @@ class DbInfo:
             if expected_key not in kwargs:
                 kwargs[expected_key] = getattr(self, expected_key)
         return DbInfo(self.db, **kwargs)
+
+    def get_fill_string_from_distances(self, distances: np.array):
+        sort_inds = get_distance_sort_indices(distances)
+        used_inds = set()
+        texts = []
+        total_tokens = 0
+        for ind in sort_inds:
+            if ind in used_inds:
+                continue
+            if self.use_parent_text:
+                text, n_tokens, new_used_inds = self.get_parent_text(ind)
+                used_inds.update(new_used_inds)
+            else:
+                text, n_tokens = self.get_single_text(ind)
+                used_inds.add(ind)
+            if total_tokens + n_tokens > self.max_tokens:
+                break
+            total_tokens += n_tokens
+            texts.append(text)
+            if len(texts) >= self.max_texts:
+                break
+        fill_string = self.prefix + self.join_string.join(texts) + self.suffix
+        return fill_string
+
+    def get_single_text(self, ind: int):
+        row = self.db.df.iloc[ind]
+        text = row[self.db.embed_col]
+        n_tokens = row[self.db.n_tokens_col]
+        return text, n_tokens
+
+    def get_parent_text(self, ind: int):
+        """
+        Intuition of "parent document" retriever is to retrieve for inclusion in a prompt the "parent" document,
+        similar to including docs on either "side" as additional context.
+
+        Read more: https://python.langchain.com/docs/modules/data_connection/retrievers/parent_document_retriever
+
+        Args:
+            ind (int): Most semantically relevant index to retrieve parents of.
+        """
+        df = self.db.df
+        row = df.iloc[ind]
+        and_cond = np.ones(len(df), dtype=bool)
+        for col in self.parent_group_cols:
+            cond = df[col] == row[col]
+            and_cond = np.logical_and(and_cond, cond)
+        parent = df[and_cond]
+        if self.parent_sort_cols is not None:
+            parent = parent.sort_values(by=self.parent_sort_cols)
+        new_used_inds = set(np.nonzero(and_cond)[0])
+        assert ind in new_used_inds
+        texts = parent[self.db.embed_col]
+        n_tokens_rows = parent[self.db.n_tokens_col]
+        text = self.parent_join_string.join(texts)
+        n_tokens = (
+            n_tokens_rows.sum()
+        )  # note this will underestimate the true number of tokens, due to whatever parent_join_string is
+        return text, n_tokens, new_used_inds

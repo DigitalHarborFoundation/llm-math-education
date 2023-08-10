@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -53,3 +55,50 @@ def test_DbInfo(retrieval_db):
     assert db_info2.max_tokens == 1
     db_info3 = db_info.copy(max_tokens=2)
     assert db_info3.max_tokens == 2
+
+
+def test_DbInfo_get_fill_string_from_distances(retrieval_db):
+    test_prefix = "test_prefix"
+    test_suffix = "test_suffix"
+    db_info = retrieval.DbInfo(retrieval_db, prefix=test_prefix, suffix=test_suffix, max_texts=1)
+    distances = np.array([0] + [1] * (len(db_info.db.df) - 1))
+    assert len(distances) == len(db_info.db.df)
+    fill_string = db_info.get_fill_string_from_distances(distances)
+    assert fill_string.startswith(test_prefix)
+    assert fill_string.endswith(test_suffix)
+    assert db_info.db.df[db_info.db.embed_col].iloc[0] in fill_string
+    assert all(db_info.db.df[db_info.db.embed_col].iloc[1:].map(lambda t: t not in fill_string))
+
+
+def test_DbInfo_get_single_text(retrieval_db):
+    db_info = retrieval.DbInfo(retrieval_db)
+    text, n_tokens = db_info.get_single_text(0)
+    assert text == db_info.db.df[db_info.db.embed_col].iloc[0]
+    assert n_tokens > 0
+
+
+def test_DbInfo_get_parent_text(retrieval_db):
+    db_info = retrieval.DbInfo(
+        retrieval_db,
+        max_texts=1,
+        use_parent_text=True,
+        parent_group_cols=["group_var"],
+        parent_sort_cols=["categorical_var"],
+    )
+    text, n_tokens, used_inds = db_info.get_parent_text(0)
+    assert used_inds == {0, 1}
+    expected_parent_rows = db_info.db.df[db_info.db.df["group_var"] == 1]
+    expected_text = "\n".join(expected_parent_rows[db_info.db.embed_col])
+    assert text == expected_text, f"Parent text was {text}"
+    assert n_tokens == expected_parent_rows[db_info.db.n_tokens_col].sum()
+
+    # here, we retrieve the second entry in a parent text but we still get back the first and second together
+    distances = np.array([1, 0, 1])
+    fill_string = db_info.get_fill_string_from_distances(distances)
+    assert fill_string == expected_text
+
+    # check for non-duplicate retrieval
+    db_info.max_texts = 2
+    distances = np.array([0, 0, 1])
+    fill_string = db_info.get_fill_string_from_distances(distances)
+    assert len(re.findall(expected_text, fill_string)) == 1, f"Duplicate retrieval in {fill_string}"

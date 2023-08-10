@@ -32,7 +32,8 @@ The following paragraphs are examples of content that may or not be relevant in 
 {question}
 
 The correct answer is {correct_answer}, but I answered {incorrect_answer}.
-I think I made a small slip-up. In just one sentence, what did I do wrong?""",
+I think I made a small slip-up. What did I do wrong?
+Your answer should be one sentence and start with "Remember to".""",
             },
         ],
     },

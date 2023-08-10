@@ -71,6 +71,7 @@ class PromptManager:
         self.retrieval_strategy: retrieval_strategies.RetrievalStrategy = retrieval_strategies.NoRetrievalStrategy()
         self.stored_messages: list[dict[str, str]] = []
         self.most_recent_slot_fill_dict: dict[str, str] = {}
+        self.recent_slot_fill_dict: list[dict[str, str]] = []
 
     def set_intro_messages(self, intro_messages: list[dict[str, str]]) -> PromptManager:
         self.intro_messages = intro_messages
@@ -91,7 +92,12 @@ class PromptManager:
         self.stored_messages.clear()
         return self
 
-    def build_query(self, user_query: str | None = None, previous_messages: list[dict[str, str]] | None = None):
+    def build_query(
+        self,
+        user_query: str | None = None,
+        previous_messages: list[dict[str, str]] | None = None,
+        query_for_retrieval_context: str | None = None,
+    ):
         if previous_messages is None:
             previous_messages = self.stored_messages
         if len(previous_messages) == 0:
@@ -110,7 +116,8 @@ class PromptManager:
             messages.append(user_message)
             self.stored_messages.append(user_message)
 
-        query_for_retrieval_context = ""
+        if query_for_retrieval_context is None:
+            query_for_retrieval_context = ""
         for message in messages[::-1]:
             expected_slots = PromptManager.identify_slots(message["content"])
             if len(expected_slots) > 0:
@@ -120,15 +127,19 @@ class PromptManager:
                     messages,
                 )
                 self.most_recent_slot_fill_dict = slot_fill_dict
+                self.recent_slot_fill_dict.append(slot_fill_dict)
                 assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
                 try:
                     message["content"] = message["content"].format(**slot_fill_dict)
                 except KeyError:
                     raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}.")
+            else:
+                self.recent_slot_fill_dict.append({})
             if query_for_retrieval_context == "" and message["role"] == "user":
                 # use as retrieval context the most recent user message
                 # TODO rethink this, providing a more flexible way to specify the retrieval context
                 query_for_retrieval_context = message["content"]
+        self.recent_slot_fill_dict = self.recent_slot_fill_dict[::-1]
         return messages
 
     def compute_stored_token_counts(self) -> int:

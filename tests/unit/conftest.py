@@ -18,14 +18,17 @@ def retrieval_db_path(tmp_path, monkeypatch):
         [
             {
                 "categorical_var": "A",
+                "group_var": 1,
                 "text": "Test text 1.",
             },
             {
                 "categorical_var": "B",
+                "group_var": 1,
                 "text": "Test text 2.",
             },
             {
                 "categorical_var": "C",
+                "group_var": 2,
                 "text": "Test text 3.",
             },
         ],

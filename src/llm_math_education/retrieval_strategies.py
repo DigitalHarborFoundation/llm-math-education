@@ -74,20 +74,8 @@ class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
                 if type(db_info) is str:
                     fill_string = db_info
                 else:
-                    db = db_info.db
-                    distances = db.compute_string_distances(user_query)
-                    sort_inds = retrieval.get_distance_sort_indices(distances)
-                    texts = []
-                    total_tokens = 0
-                    for ind in sort_inds:
-                        row = db.df.iloc[ind]
-                        n_tokens = row[db.n_tokens_col]
-                        if total_tokens + n_tokens > db_info.max_tokens:
-                            break
-                        total_tokens += n_tokens
-                        text = row[db.embed_col]
-                        texts.append(text)
-                    fill_string = db_info.prefix + "\n".join(texts) + db_info.suffix
+                    distances = db_info.db.compute_string_distances(user_query)
+                    fill_string = db_info.get_fill_string_from_distances(distances)
             else:
                 fill_string = self.nonmatching_fill
             fill_string_map[expected_slot] = fill_string
