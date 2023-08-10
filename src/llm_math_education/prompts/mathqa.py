@@ -44,4 +44,18 @@ If the student says something inappropriate or off topic you will say you can on
             },
         ],
     },
+    "instruct_qa": {
+        # inspired by the instruct-qa QAPromptTemplate: https://github.com/McGill-NLP/instruct-qa/blob/main/instruct_qa/prompt/templates.py
+        "pretty_name": "McGill's (very general) instruct-qa prompt",
+        "messages": [
+            {
+                "role": "user",
+                "content": """Please answer the following question given the following passages:
+{rori_microlesson_texts}
+{openstax_subsection_texts}
+Question: {user_query}
+Answer: """,
+            },
+        ],
+    },
 }

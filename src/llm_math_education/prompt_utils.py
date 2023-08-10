@@ -116,6 +116,7 @@ class PromptManager:
             messages.append(user_message)
             self.stored_messages.append(user_message)
 
+        should_remove_user_query_message = False
         if query_for_retrieval_context is None:
             query_for_retrieval_context = ""
         for message in messages[::-1]:
@@ -129,6 +130,10 @@ class PromptManager:
                 self.most_recent_slot_fill_dict = slot_fill_dict
                 self.recent_slot_fill_dict.append(slot_fill_dict)
                 assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
+                if "user_query" in slot_fill_dict and user_query is not None:
+                    # special case: fill user_query slots with the current user_query
+                    slot_fill_dict["user_query"] = user_query
+                    should_remove_user_query_message = True
                 try:
                     message["content"] = message["content"].format(**slot_fill_dict)
                 except KeyError:
@@ -140,6 +145,10 @@ class PromptManager:
                 # TODO rethink this, providing a more flexible way to specify the retrieval context
                 query_for_retrieval_context = message["content"]
         self.recent_slot_fill_dict = self.recent_slot_fill_dict[::-1]
+        if should_remove_user_query_message:
+            self.stored_messages.pop()
+            assert messages[-1]["content"] == user_query
+            messages = messages[:-1]
         return messages
 
     def compute_stored_token_counts(self) -> int:

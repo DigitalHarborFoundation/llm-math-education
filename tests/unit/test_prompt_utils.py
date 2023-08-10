@@ -102,3 +102,27 @@ def test_PromptManager_retrieval():
 def test_identify_slots():
     slots = prompt_utils.PromptManager.identify_slots("test {test1} {test2} {test3 }")
     assert slots == ["test1", "test2"]
+
+
+def test_user_query_replacement():
+    test_intro_messages = [
+        {
+            "role": "user",
+            "content": "Question: {user_query}",
+        },
+    ]
+    messages = prompt_utils.PromptManager().set_intro_messages(test_intro_messages).build_query("Test")
+    assert len(messages) == 1
+    assert messages[0]["content"] == "Question: Test"
+
+    # exception has to be exactly the slot name "user_query"
+    test_intro_messages = [
+        {
+            "role": "user",
+            "content": "Question: {other_slot}",
+        },
+    ]
+    messages = prompt_utils.PromptManager().set_intro_messages(test_intro_messages).build_query("Test")
+    assert len(messages) == 2
+    assert messages[0]["content"] == "Question: "
+    assert messages[1]["content"] == "Test"

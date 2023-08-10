@@ -191,7 +191,7 @@ class DbInfo:
             cond = df[col] == row[col]
             and_cond = np.logical_and(and_cond, cond)
         parent = df[and_cond]
-        if self.parent_sort_cols is not None:
+        if self.parent_sort_cols is not None and len(self.parent_sort_cols) > 1:
             parent = parent.sort_values(by=self.parent_sort_cols)
         new_used_inds = set(np.nonzero(and_cond)[0])
         assert ind in new_used_inds
