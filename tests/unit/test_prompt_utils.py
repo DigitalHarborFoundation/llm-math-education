@@ -115,7 +115,8 @@ def test_user_query_replacement():
     assert len(messages) == 1
     assert messages[0]["content"] == "Question: Test"
 
-    # exception has to be exactly the slot name "user_query"
+    # this behavior requires exactly the slot name "user_query"
+    # compare to the below behavior, which produces 2 messages
     test_intro_messages = [
         {
             "role": "user",
