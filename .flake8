@@ -1,7 +1,8 @@
 [flake8]
 exclude = venv
-ignore = E203, E501
+ignore = E203, E501, W503
 max-line-length = 120
 
 # E203: Whitespace before ':'
 # E501: Line too long
+# W503: https://github.com/psf/black/issues/52 and https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8

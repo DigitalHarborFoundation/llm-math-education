@@ -12,7 +12,6 @@ def test_StaticRetrievalStrategy():
 
 
 def test_EmbeddingRetrievalStrategy(retrieval_db_path):
-    # TODO is monkeypatch needed here? this might be making an actual API call...
     db = retrieval.RetrievalDb(retrieval_db_path, "conftestDb", "text")
     retriever = retrieval_strategies.EmbeddingRetrievalStrategy(db, max_tokens=5)
     filled_slots = retriever.do_retrieval(["testSlot"], "testQuery")
@@ -24,3 +23,30 @@ def test_EmbeddingRetrievalStrategy(retrieval_db_path):
     retriever = retrieval_strategies.EmbeddingRetrievalStrategy(db, max_tokens=0)
     filled_slots = retriever.do_retrieval(["testSlot"], "testQuery")
     assert filled_slots["testSlot"] == ""
+
+
+def test_MappedEmbeddingRetrievalStrategy(retrieval_db):
+    slot_map = {
+        "slot1": "fill1",
+        "slot2": "fill2",
+    }
+    retriever = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map, nonmatching_fill="nomatch")
+    filled_slots = retriever.do_retrieval(["slot1", "slot2"], "")
+    assert slot_map == filled_slots
+    filled_slots = retriever.do_retrieval(["slot1", "slot2", "slot3"], "")
+    assert filled_slots["slot3"] == "nomatch"
+    for slot, slot_fill in slot_map.items():
+        assert filled_slots[slot] == slot_fill
+
+    slot_map = {
+        "slot1": "fill1",
+        "slot2": retrieval.DbInfo(retrieval_db),
+    }
+    retriever = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map)
+    filled_slots = retriever.do_retrieval(["slot1", "slot2"], "")
+    assert filled_slots["slot1"] == "fill1"
+    assert filled_slots["slot2"].startswith("Test text")
+
+    retriever.update_map({"slot2": "fill2"})
+    filled_slots = retriever.do_retrieval(["slot1", "slot2"], "")
+    assert filled_slots["slot2"] == "fill2"

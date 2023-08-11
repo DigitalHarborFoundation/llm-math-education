@@ -74,6 +74,7 @@ def process_user_query(user_query: str):
                 model="gpt-3.5-turbo-0613",
                 messages=messages,
                 temperature=st.session_state.temperature,
+                request_timeout=20,
             )
             assistant_message = completion["choices"][0]["message"]
             assert "role" in assistant_message and "content" in assistant_message
@@ -168,7 +169,7 @@ def instantiate_session():
                 },
             ]
     # load dbs for retrieval
-    was_data_loaded = data_utils.load_session_data()
+    was_data_loaded = data_utils.cache_retrieval_data_in_session()
     if was_data_loaded:
         st.session_state.retrieval_strategy = next(iter(st.session_state.retrieval_options_map.values()))
         st.session_state.prompt_manager.set_retrieval_strategy(st.session_state.retrieval_strategy)

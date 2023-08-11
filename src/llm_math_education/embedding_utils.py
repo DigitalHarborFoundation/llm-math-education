@@ -1,3 +1,5 @@
+import functools
+
 import numpy as np
 import openai
 import tiktoken
@@ -16,6 +18,11 @@ def get_token_counts(text_list: list[str]) -> list[int]:
 
 
 def get_openai_embeddings(texts: list[str], embedding_model: str = EMBEDDING_MODEL) -> list[np.array]:
+    return get_openai_embeddings_cached(tuple(texts), embedding_model=embedding_model)
+
+
+@functools.lru_cache(maxsize=512, typed=True)
+def get_openai_embeddings_cached(texts: tuple[str], embedding_model: str = EMBEDDING_MODEL) -> list[np.array]:
     result = openai.Embedding.create(input=texts, engine=embedding_model)
     embedding_list = [np.array(d["embedding"]) for d in result.data]
     return embedding_list

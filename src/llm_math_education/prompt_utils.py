@@ -71,6 +71,7 @@ class PromptManager:
         self.retrieval_strategy: retrieval_strategies.RetrievalStrategy = retrieval_strategies.NoRetrievalStrategy()
         self.stored_messages: list[dict[str, str]] = []
         self.most_recent_slot_fill_dict: dict[str, str] = {}
+        self.recent_slot_fill_dict: list[dict[str, str]] = []
 
     def set_intro_messages(self, intro_messages: list[dict[str, str]]) -> PromptManager:
         self.intro_messages = intro_messages
@@ -80,6 +81,9 @@ class PromptManager:
         self.retrieval_strategy = retrieval_strategy
         return self
 
+    def get_retrieval_strategy(self) -> retrieval_strategies.RetrievalStrategy:
+        return self.retrieval_strategy
+
     def add_stored_message(self, message: dict[str, str]) -> PromptManager:
         self.stored_messages.append(message)
         return self
@@ -88,40 +92,63 @@ class PromptManager:
         self.stored_messages.clear()
         return self
 
-    def build_query(self, user_query: str, previous_messages: list[dict[str, str]] | None = None):
+    def build_query(
+        self,
+        user_query: str | None = None,
+        previous_messages: list[dict[str, str]] | None = None,
+        query_for_retrieval_context: str | None = None,
+    ):
         if previous_messages is None:
             previous_messages = self.stored_messages
-        messages = []
         if len(previous_messages) == 0:
             # this is a new query
             messages = [message.copy() for message in self.intro_messages]
-            for message in messages:
-                expected_slots = PromptManager.identify_slots(message["content"])
-                if len(expected_slots) > 0:
-                    slot_fill_dict = self.retrieval_strategy.do_retrieval(
-                        expected_slots,
-                        user_query,
-                        messages,
-                    )
-                    self.most_recent_slot_fill_dict = slot_fill_dict
-                    assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
-                    try:
-                        message["content"] = message["content"].format(**slot_fill_dict)
-                    except KeyError:
-                        raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}.")
-            # store the intro messages
             self.stored_messages.extend(messages)
         else:
             # not a new query,
             # so include the previous messages as context
-            messages += previous_messages
-        # TODO identify if the user query has slots to fill
-        user_message = {
-            "role": "user",
-            "content": user_query,
-        }
-        self.stored_messages.append(user_message)
-        messages.append(user_message)
+            messages = [message.copy() for message in previous_messages]
+        if user_query is not None:
+            user_message = {
+                "role": "user",
+                "content": user_query,
+            }
+            messages.append(user_message)
+            self.stored_messages.append(user_message)
+
+        should_remove_user_query_message = False
+        if query_for_retrieval_context is None:
+            query_for_retrieval_context = ""
+        for message in messages[::-1]:
+            expected_slots = PromptManager.identify_slots(message["content"])
+            if len(expected_slots) > 0:
+                slot_fill_dict = self.retrieval_strategy.do_retrieval(
+                    expected_slots,
+                    query_for_retrieval_context,
+                    messages,
+                )
+                self.most_recent_slot_fill_dict = slot_fill_dict
+                self.recent_slot_fill_dict.append(slot_fill_dict)
+                assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
+                if "user_query" in slot_fill_dict and user_query is not None:
+                    # special case: fill user_query slots with the current user_query
+                    slot_fill_dict["user_query"] = user_query
+                    should_remove_user_query_message = True
+                try:
+                    message["content"] = message["content"].format(**slot_fill_dict)
+                except KeyError:
+                    raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}.")
+            else:
+                self.recent_slot_fill_dict.append({})
+            if query_for_retrieval_context == "" and message["role"] == "user":
+                # use as retrieval context the most recent user message
+                # TODO rethink this, providing a more flexible way to specify the retrieval context
+                query_for_retrieval_context = message["content"]
+        self.recent_slot_fill_dict = self.recent_slot_fill_dict[::-1]
+        if should_remove_user_query_message:
+            self.stored_messages.pop()
+            assert messages[-1]["content"] == user_query
+            messages = messages[:-1]
         return messages
 
     def compute_stored_token_counts(self) -> int:
@@ -131,4 +158,4 @@ class PromptManager:
 
     def identify_slots(prompt_string: str) -> list[str]:
         expected_slots = re.findall(r"{[^{} ]+}", prompt_string)
-        return [slot[1:-1] for slot in expected_slots]
+        return sorted({slot[1:-1] for slot in expected_slots})

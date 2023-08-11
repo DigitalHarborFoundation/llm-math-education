@@ -18,14 +18,17 @@ def retrieval_db_path(tmp_path, monkeypatch):
         [
             {
                 "categorical_var": "A",
+                "group_var": 1,
                 "text": "Test text 1.",
             },
             {
                 "categorical_var": "B",
+                "group_var": 1,
                 "text": "Test text 2.",
             },
             {
                 "categorical_var": "C",
+                "group_var": 2,
                 "text": "Test text 3.",
             },
         ],
@@ -34,6 +37,12 @@ def retrieval_db_path(tmp_path, monkeypatch):
     db.create_embeddings()
     db.save_df()
     return tmp_path
+
+
+@pytest.fixture
+def retrieval_db(retrieval_db_path) -> retrieval.RetrievalDb:
+    db = retrieval.RetrievalDb(retrieval_db_path, "conftestDb", "text")
+    return db
 
 
 @pytest.fixture(autouse=True)
