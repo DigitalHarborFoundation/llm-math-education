@@ -1,0 +1,641 @@
+unique_index,lesson_code,grade,domain,construct,subconstruct,skill,lesson_index,topic,short_description,lesson,question,answer,hint,has_image,section,question_index,is_explanation,needs_context,context_string,n_question_tokens,incorrect_answer,description
+434,G8.A2.1.1.1,8,A,A2,A2.1,A2.1.1,1,Linear Expressions (1 of 2),Let us learn how to write algebraic expressions with multiple variables in the given situations.,"An algebraic expression is an expression which is made up of variables and constants, along with algebraic operations (addition, subtraction, etc.).
+
+We can use different words for addition, subtraction, multiplication, and division so it will be easier for us to write the algebraic expressions.
+
+Here are common words used for each operation:
+Addition- plus, sum, more than, increased by
+Subtraction - subtracted, minus, difference, less than, decreased by
+Multiplication - times, product
+Division - divided, quotient
+
+Let us look at an example.
+
+Write *Yes* to proceed.
+
+
+Example
+Ques:  Akeelah bought 4 clips for x dollars each and a wristwatch for y dollars.
+The expression for this would be:
+
+A. 4 + x + y
+B. 4x + y
+C. x + y
+D. 4 + x
+
+Hint:
+Multiply x by 4 and then add the price of wristwatch y.
+i.e 4*x + y = 4x + y
+
+Ans: B
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.","A car travels 120 miles in H hours. The expression represents the average speed in miles per hour is ___
+Speed = distance/time
+A. 120/H
+B. 120 x H
+C. 120 + H
+D. H/120
+Choose from the options A, B, C and D.",A,"Speed is given by distance/ time.
+Here Distance = 120 miles
+Time = H hours.
+Substitute to get the expression.",False,2,2,False,False,,38.0,B,Let us learn how to write algebraic expressions with multiple variables in the given situations.
+435,G8.A2.1.1.1,8,A,A2,A2.1,A2.1.1,1,Linear Expressions (1 of 2),Let us learn how to write algebraic expressions with multiple variables in the given situations.,"An algebraic expression is an expression which is made up of variables and constants, along with algebraic operations (addition, subtraction, etc.).
+
+We can use different words for addition, subtraction, multiplication, and division so it will be easier for us to write the algebraic expressions.
+
+Here are common words used for each operation:
+Addition- plus, sum, more than, increased by
+Subtraction - subtracted, minus, difference, less than, decreased by
+Multiplication - times, product
+Division - divided, quotient
+
+Let us look at an example.
+
+Write *Yes* to proceed.
+
+
+Example
+Ques:  Akeelah bought 4 clips for x dollars each and a wristwatch for y dollars.
+The expression for this would be:
+
+A. 4 + x + y
+B. 4x + y
+C. x + y
+D. 4 + x
+
+Hint:
+Multiply x by 4 and then add the price of wristwatch y.
+i.e 4*x + y = 4x + y
+
+Ans: B
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.","In stable, there are z horses. 10 of them are taken into the yard to exercise. The expression that represents the number of horses left is _____.
+A. 10z
+B. 10-z
+C. 10/z
+D. z-10",D,"""Taken into"" means subtract.
+Subtract 10 by the horses in stable.",False,2,3,False,False,,31.0,A,Let us learn how to write algebraic expressions with multiple variables in the given situations.
+436,G8.A2.1.1.1,8,A,A2,A2.1,A2.1.1,1,Linear Expressions (1 of 2),Let us learn how to write algebraic expressions with multiple variables in the given situations.,"An algebraic expression is an expression which is made up of variables and constants, along with algebraic operations (addition, subtraction, etc.).
+
+We can use different words for addition, subtraction, multiplication, and division so it will be easier for us to write the algebraic expressions.
+
+Here are common words used for each operation:
+Addition- plus, sum, more than, increased by
+Subtraction - subtracted, minus, difference, less than, decreased by
+Multiplication - times, product
+Division - divided, quotient
+
+Let us look at an example.
+
+Write *Yes* to proceed.
+
+
+Example
+Ques:  Akeelah bought 4 clips for x dollars each and a wristwatch for y dollars.
+The expression for this would be:
+
+A. 4 + x + y
+B. 4x + y
+C. x + y
+D. 4 + x
+
+Hint:
+Multiply x by 4 and then add the price of wristwatch y.
+i.e 4*x + y = 4x + y
+
+Ans: B
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.","John scores 3 more points than James p scores.
+The expression that represents John's score is _____.
+A. 3p
+B. p + 3
+C. p - 3
+D. 3/p",B,"3 points more than James score is p added by 3.
+This is expressed as_____.",False,2,4,False,False,,26.0,A,Let us learn how to write algebraic expressions with multiple variables in the given situations.
+437,G8.A2.1.1.1,8,A,A2,A2.1,A2.1.1,1,Linear Expressions (1 of 2),Let us learn how to write algebraic expressions with multiple variables in the given situations.,"An algebraic expression is an expression which is made up of variables and constants, along with algebraic operations (addition, subtraction, etc.).
+
+We can use different words for addition, subtraction, multiplication, and division so it will be easier for us to write the algebraic expressions.
+
+Here are common words used for each operation:
+Addition- plus, sum, more than, increased by
+Subtraction - subtracted, minus, difference, less than, decreased by
+Multiplication - times, product
+Division - divided, quotient
+
+Let us look at an example.
+
+Write *Yes* to proceed.
+
+
+Example
+Ques:  Akeelah bought 4 clips for x dollars each and a wristwatch for y dollars.
+The expression for this would be:
+
+A. 4 + x + y
+B. 4x + y
+C. x + y
+D. 4 + x
+
+Hint:
+Multiply x by 4 and then add the price of wristwatch y.
+i.e 4*x + y = 4x + y
+
+Ans: B
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.","If you multiply four by n and decreased by six, the expression for this would be ______.
+A. 4n - 6
+B. 4 (n - 6)
+C. 4(6) - n
+D. 6n - 4",A,"4 times n is 4n, decreased by 6 would be?",False,2,5,False,False,,30.0,B,Let us learn how to write algebraic expressions with multiple variables in the given situations.
+438,G8.A2.1.1.1,8,A,A2,A2.1,A2.1.1,1,Linear Expressions (1 of 2),Let us learn how to write algebraic expressions with multiple variables in the given situations.,"An algebraic expression is an expression which is made up of variables and constants, along with algebraic operations (addition, subtraction, etc.).
+
+We can use different words for addition, subtraction, multiplication, and division so it will be easier for us to write the algebraic expressions.
+
+Here are common words used for each operation:
+Addition- plus, sum, more than, increased by
+Subtraction - subtracted, minus, difference, less than, decreased by
+Multiplication - times, product
+Division - divided, quotient
+
+Let us look at an example.
+
+Write *Yes* to proceed.
+
+
+Example
+Ques:  Akeelah bought 4 clips for x dollars each and a wristwatch for y dollars.
+The expression for this would be:
+
+A. 4 + x + y
+B. 4x + y
+C. x + y
+D. 4 + x
+
+Hint:
+Multiply x by 4 and then add the price of wristwatch y.
+i.e 4*x + y = 4x + y
+
+Ans: B
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.","The difference of thirteen and y, then add x. The expression for this would be _______
+A. x (13 - y)
+B. 13x - 6
+C.(13 - y) + x
+D. 13y + x",C,"Difference means subtraction.
+Difference of 13 and y is ?
+Add x to this.",False,2,6,False,False,,30.0,D,Let us learn how to write algebraic expressions with multiple variables in the given situations.
+441,G8.A2.1.1.1,8,A,A2,A2.1,A2.1.1,1,Linear Expressions (1 of 2),Let us learn how to write algebraic expressions with multiple variables in the given situations.,"An algebraic expression is an expression which is made up of variables and constants, along with algebraic operations (addition, subtraction, etc.).
+
+We can use different words for addition, subtraction, multiplication, and division so it will be easier for us to write the algebraic expressions.
+
+Here are common words used for each operation:
+Addition- plus, sum, more than, increased by
+Subtraction - subtracted, minus, difference, less than, decreased by
+Multiplication - times, product
+Division - divided, quotient
+
+Let us look at an example.
+
+Write *Yes* to proceed.
+
+
+Example
+Ques:  Akeelah bought 4 clips for x dollars each and a wristwatch for y dollars.
+The expression for this would be:
+
+A. 4 + x + y
+B. 4x + y
+C. x + y
+D. 4 + x
+
+Hint:
+Multiply x by 4 and then add the price of wristwatch y.
+i.e 4*x + y = 4x + y
+
+Ans: B
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.","There are x ballpens in a pack.
+I buy 4 pack of ball pens and y pencils.
+The expression for this would be _______
+A. 4 + x + y
+B. 4x + y
+C.4 - x - y
+D. 4xy",B,Multiply 4 packs with number of ballpens and add y.,False,2,9,False,False,,37.0,A,Let us learn how to write algebraic expressions with multiple variables in the given situations.
+445,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.",8/10 = _____%,80,"Divide 8 by 10 to get 0.8.
+Multiply 0.8 x 100 = ?",False,1,1,False,False,,3.0,0.8,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+446,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.",2/5 = _____%,40,"Divide 2 by 5 to get 0.4.
+Multiply 0.4 x 100 = ?",False,1,2,False,False,,3.0,10,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+447,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.",6/20 = _____%,30,"Divide 6 by 20 to get 0.3.
+Multiply 0.3 x 100 = ?",False,1,3,False,False,,3.0,60,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+448,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.",34/100 = _____%,34,"Divide 34 by 100 to get 0.34.
+Multiply this answer by 100.",False,1,4,False,False,,3.0,340,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+449,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.",125/1000 = ____ %,12.5,Divide the numerator by the denominator and multiply the answer by 100.,False,1,5,False,False,,4.0,125,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+451,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.
+
+You are doing great!
+
+Now let's look at converting a percentage value to a fraction.
+
+To do this, divide the value by 100.
+
+Remember to *simplify* the fraction whenever needed.
+Write the answer *without* the % sign.
+
+Example:
+Ques: Conver the following percentage value to a fraction.
+12% = _____
+
+Hint: Divide 12 by 100 and simplify.
+        12/100 = 3/25
+
+Ans: 3/25
+
+Shall we try some questions like this?
+
+Write *Yes* to proceed.","60% = ____
+Write the answer in fraction form with a slash (/) to seperate the numerator and denominator.",3/5,"Divide 60 by 100.
+60/100 simplifies to ?",False,2,7,False,False,,18.0,6/10,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+453,G8.N3.2.4.1,8,N,N3,N3.2,N3.2.4,1,Percentage and fraction (1 of 2),"In today's lesson, we are going to practice converting percentage into fraction and vice-versa.","Fractions and percentages can be used interchangeably.
+We can convert fraction to percentage by dividing the numerator by the denominator and multiplying by 100.
+Add the % symbol to the answer.
+
+Example:
+Ques: Convert the given fraction to percentage.
+ 7/10 = _____%
+
+Hint: Divide 7 by 10 to get 0.7,
+         0.7 x 100 = 70%
+
+Ans:  70
+
+Would you like to try some questions?
+
+Write *Yes* to proceed.
+
+You are doing great!
+
+Now let's look at converting a percentage value to a fraction.
+
+To do this, divide the value by 100.
+
+Remember to *simplify* the fraction whenever needed.
+Write the answer *without* the % sign.
+
+Example:
+Ques: Conver the following percentage value to a fraction.
+12% = _____
+
+Hint: Divide 12 by 100 and simplify.
+        12/100 = 3/25
+
+Ans: 3/25
+
+Shall we try some questions like this?
+
+Write *Yes* to proceed.","7.5% = ____
+Write the answer in fraction form with a slash (/) to seperate the numerator and denominator",3/40,"Divide 7.5 by 100.
+7.5/100  = 75/1000.
+75/1000 simplifies to ?",False,2,9,False,False,,18.0,0.075,"In today's lesson, we are going to practice converting percentage into fraction and vice-versa."
+457,G7.N5.1.1.2,7,N,N5,N5.1,N5.1.1,2,Indices (2 of 2),Let's write multiplication expressions using indices.,"An index (or indices) is the power or an exponent which is used to represent the number of times the number is multiplied to itself.
+
+Ex: 5x5x5 can be written as 5³. The number 3 is called the exponent of the base 5.
+
+
+Ques: Write the expression as an exponent.
+4 x 4
+Ans: 4²
+
+Hint: 4 multiplied by itself 3 times.
+
+It's time for you to pratice. Are you ready?
+
+Use (^) to show the power of the number. (Ex. 2 to the power 3 is 2^3).
+
+Write the expression as an exponent.
+
+Write Yes to proceed.",2 x 2 = ___ ,2^2,"Count the number of times 2 appears in the multiplication.
+Hence the power will be?",False,1,1,False,False,,6.0,4,Let's write multiplication expressions using indices.
+476,G7.N5.1.1.1,7,N,N5,N5.1,N5.1.1,1,Indices (1 of 2),"It is good to have you here!
+Let's learn how to find the square root of numbers.","Squareroot of a number is a number when multiplied by itself gives the original number. Square root is denoted by √.
+Note that square roots exist only for positive numbers.
+
+Example:
+Find the square root of the given number
+Ques:  √196
+Ans: 14
+Hint: 14 multiplied by 14 gives the number 196.
+
+It's time for you to pratice. Shall we get started?
+
+Write yes to proceed.
+", √225 = __,15,Which number when multiplied by itself gives 225.,False,1,9,False,False,,4.0,25,"It is good to have you here!
+Let's learn how to find the square root of numbers."
+541,G6.S2.1.1.1,6,S,S2,S2.1,S2.1.1,1,Probability (1 of 2),"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!","Every event has a likelihood of happening.
+Example: When the sky is cloudy, there is a likelihood of rain.
+This lesson helps you to understand the likelihood of an event happening.
+
+Example:
+Ques:Choose from the options A, B and C.
+There are 2 blue marbles, 4 red marbles and 6 green marbles in a jar.
+If you pick a marble without looking, which marble is more likely to be picked?
+A. Green
+B. Red
+C. Blue
+
+Ans: A
+Hint: There are 6 green marbles which is the most number of marbles in one colour, so there's a bigger chance of grabbing a green one.
+
+Would you like to try it for yourself?
+
+Type *Yes* to continue.","There are 5 candies in a jar, 2 are caramel, 2 are lollipops and 1 is a sour candy.
+If you pick one at random, what candy are you least likely to grab?
+A. Caramel
+B. Lollipop
+C. Sour candy
+Type A, B or C.",C,"If you look at the number of candies, you can see that there is only 1 sour candy which is less than the caramel candy and the lollipops.
+Hence the candy of which there is the fewest has the least chance to be grabbed.",False,1,1,False,False,,41.0,B,"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!"
+542,G6.S2.1.1.1,6,S,S2,S2.1,S2.1.1,1,Probability (1 of 2),"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!","Every event has a likelihood of happening.
+Example: When the sky is cloudy, there is a likelihood of rain.
+This lesson helps you to understand the likelihood of an event happening.
+
+Example:
+Ques:Choose from the options A, B and C.
+There are 2 blue marbles, 4 red marbles and 6 green marbles in a jar.
+If you pick a marble without looking, which marble is more likely to be picked?
+A. Green
+B. Red
+C. Blue
+
+Ans: A
+Hint: There are 6 green marbles which is the most number of marbles in one colour, so there's a bigger chance of grabbing a green one.
+
+Would you like to try it for yourself?
+
+Type *Yes* to continue.","There are 5 candies in a jar, 2 are caramel, 2 are lollipops and 1 is a sour candy.
+Is it more likely to randomly grab a caramel or a lollipop?
+A. Caramel
+B. Lollipop
+C. Equally likely",C,There are 2 of both candies in the jar. So the chance of picking either one is the same.,False,1,2,False,False,,35.0,A,"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!"
+543,G6.S2.1.1.1,6,S,S2,S2.1,S2.1.1,1,Probability (1 of 2),"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!","Every event has a likelihood of happening.
+Example: When the sky is cloudy, there is a likelihood of rain.
+This lesson helps you to understand the likelihood of an event happening.
+
+Example:
+Ques:Choose from the options A, B and C.
+There are 2 blue marbles, 4 red marbles and 6 green marbles in a jar.
+If you pick a marble without looking, which marble is more likely to be picked?
+A. Green
+B. Red
+C. Blue
+
+Ans: A
+Hint: There are 6 green marbles which is the most number of marbles in one colour, so there's a bigger chance of grabbing a green one.
+
+Would you like to try it for yourself?
+
+Type *Yes* to continue.","John throws a die. What's more likely, for him to throw a 6 or a 4?
+A. Equally likely
+B. Less likely
+C. More likely",A,"In a die, all the numbers have the same chance of being selected.
+Hence getting a 6 or 4 is ?",False,1,3,False,False,,22.0,C,"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!"
+545,G6.S2.1.1.1,6,S,S2,S2.1,S2.1.1,1,Probability (1 of 2),"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!","Every event has a likelihood of happening.
+Example: When the sky is cloudy, there is a likelihood of rain.
+This lesson helps you to understand the likelihood of an event happening.
+
+Example:
+Ques:Choose from the options A, B and C.
+There are 2 blue marbles, 4 red marbles and 6 green marbles in a jar.
+If you pick a marble without looking, which marble is more likely to be picked?
+A. Green
+B. Red
+C. Blue
+
+Ans: A
+Hint: There are 6 green marbles which is the most number of marbles in one colour, so there's a bigger chance of grabbing a green one.
+
+Would you like to try it for yourself?
+
+Type *Yes* to continue.","When throwing a dice, how likely is it to throw a number less than 2?
+A. Less than 2 is more likely
+B. Less than 2 is less likely
+C. Equally likely
+",B,"There are 4 numbers higher than 2 on a die.
+There is only one number lower than 2. The number 1 is the only one less than 2.
+Then which event is more likely?",False,1,5,False,False,,29.0,C,"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!"
+547,G6.S2.1.1.1,6,S,S2,S2.1,S2.1.1,1,Probability (1 of 2),"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!","Every event has a likelihood of happening.
+Example: When the sky is cloudy, there is a likelihood of rain.
+This lesson helps you to understand the likelihood of an event happening.
+
+Example:
+Ques:Choose from the options A, B and C.
+There are 2 blue marbles, 4 red marbles and 6 green marbles in a jar.
+If you pick a marble without looking, which marble is more likely to be picked?
+A. Green
+B. Red
+C. Blue
+
+Ans: A
+Hint: There are 6 green marbles which is the most number of marbles in one colour, so there's a bigger chance of grabbing a green one.
+
+Would you like to try it for yourself?
+
+Type *Yes* to continue.","There are 22 balls, 4 blue, 5 red, 6 yellow and 7 green.
+If a ball is chosen randomly, what colour would be least likely to be selected?
+A. Green
+B. Yellow
+C. Blue",C,The least number balls in the set are of which colour?,False,1,7,False,False,,30.0,A,"Good to have you here!
+Today we are going to learn how to calculate the probabilitiy of the occurence of events.
+Statistically, it's likely you're going to love statistics!"
+2002,G6.N1.1.2.1,6,N,N1,N1.1,N1.1.2,1,Compare and order ( 1 of 3),"We will compare large numbers using the >, < and = signs all the way upto 1 million :-)","Numbers are compared using the symbols <, > and =.
+Let me help you recollect them!
+The < sign means less than.
+Like this: 400,000 < 500,000.
+
+The > sign means more than.
+Like this: 600,000 > 500,000.
+
+Note that the sign always points to the smaller number.
+
+We also have the equal sign =
+This sign means that two numbers are equal to each other.
+Like this:  2,000 = 2,000.
+
+Fill in the blank with >, < or =.
+For Example:
+Ques: 758,102 ____502,471
+Ans: >
+
+I hope I helped you understand 😊
+Now let's try some questions!
+
+Type Yes to proceed.","Two hundred fifty three thousand three hundred seventy two ___ 253,372",=,"Write the words into a number.
+Does it match with the number on the right?
+If yes, then they are equal :-)",False,1,10,False,False,,11.0,2,"We will compare large numbers using the >, < and = signs all the way upto 1 million :-)"
+2483,G7.N4.2.1.1,7,N,N4,N4.2,N4.2.1,1,Integer operations (1 of 5),"In this lesson, we are going to learn how to add two digit integers.
+It is going to be fun. Let's start.","When adding two integers, the only thing you should pay attention on is the sign of the integer.
+We add integers with same sign and subtract integers with different sign.
+
+Let us try out some question to understand better.
+Ques: Fill in the blanks.
+-26 + 61 = ___
+
+Ans: 35
+
+Hint: Observe the sign of the numbers, we have one + and one -.
+If the signs are different , we subtract.
+61-26=35
+Note that the answer always has the sign of the larger number, here it is 61.
+Hence the answer is +35 or 35.
+
+Would you like to try some questions?
+
+Fill in the blanks.
+
+Type Yes to proceed.", -166 + 37 = ___,-129,"Since the signs are different subtract 37 from 166.
+Remember to add the sign of the larger number to the answer.",False,1,2,False,False,,6.0,129,"In this lesson, we are going to learn how to add two digit integers.
+It is going to be fun. Let's start."
+2537,G8.N3.2.4.2,8,N,N3,N3.2,N3.2.4,2,Percentage and fraction (2 of 2),Let us learn how to convert percentages (greater than 100%) into fractions and whole numbers.,"To convert percentage into fraction, simply divide the given number by 100.
+Write your answer in mixed fraction.
+Let me show you with the help of a question.
+
+Example: Choose A , B, C or D to fill in the blank.
+Ques:  105% = ____
+
+A. 1 5/100
+B. 5.44
+C. 5.12
+D. 5/100
+Ans: A
+
+Hint: 105/100 = 1  5/100
+
+Would you like to try some questions? :-)
+
+Convert the following percentages to fractions.
+
+Type Yes to continue to solve some questions.","110% = ____
+A. 1 1/100
+B. 11 10/100
+C. 11 1/10
+D. 1 2/100",A,"Divide 110 by 100. Write your answer in mixed fraction.
+",False,1,1,False,False,,11.0,B,Let us learn how to convert percentages (greater than 100%) into fractions and whole numbers.
