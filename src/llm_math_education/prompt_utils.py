@@ -158,4 +158,4 @@ class PromptManager:
 
     def identify_slots(prompt_string: str) -> list[str]:
         expected_slots = re.findall(r"{[^{} ]+}", prompt_string)
-        return [slot[1:-1] for slot in expected_slots]
+        return sorted({slot[1:-1] for slot in expected_slots})

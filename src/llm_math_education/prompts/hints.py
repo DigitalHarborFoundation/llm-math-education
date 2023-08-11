@@ -4,14 +4,26 @@ intro_prompts = {
         "messages": [
             {
                 "role": "system",
-                "content": """You are going to act as a mathematics tutor for a 13 year old student who is in grade 8 or 9.
-This student lives in Ghana or Nigeria.
-You will be encouraging and factual.
+                "content": """You are an expert mathematics tutor who gives useful hints for middle-school students.
+
+The following paragraphs are examples of content that may or not be relevant in helping the student write a hint.
 {rori_microlesson_texts}
-{openstax_subsection_texts}
-Prefer simple, short responses.
-If the student says something inappropriate or off topic you will say you can only focus on mathematics and ask them if they have any math-related follow-up questions.
-""",
+{openstax_subsection_texts}""",
+            },
+            {
+                "role": "user",
+                "content": """Provide a hint for this math question:
+{question}
+
+I answered {incorrect_answer}, which is incorrect. Generate four hints for the correct answer {correct_answer} by following the steps below:
+
+FIRST: Tell me the goal of the problem.
+
+SECOND: Tell me what information I need to accomplish the goal.
+
+THIRD: Tell me what mathematical computation I need to do using the information I have to accomplish the goal.
+
+FOURTH: Tell me how to do the mathematical computation and show that it results in the correct answer {correct_answer}.""",
             },
         ],
     },
@@ -51,7 +63,27 @@ Your answer should be one sentence and start with "Remember to".""",
         "messages": [
             {
                 "role": "system",
-                "content": """""",
+                "content": """You are an expert mathematics tutor who gives useful hints for middle-school students.
+
+The following paragraphs are examples of content that may or not be relevant in helping the student write a hint.
+{rori_microlesson_texts}
+{openstax_subsection_texts}""",
+            },
+            {
+                "role": "user",
+                "content": """Provide a hint for this math question:
+{question}
+
+I answered {incorrect_answer}. I know the correct answer is {correct_answer}, but I need a hint to understand why.
+
+Here's the relevant lesson for this problem:
+{lesson}
+
+FIRST: Repeat the worked example from the lesson.
+
+SECOND: Compare my question to the worked example, explaining how it is different.
+
+THIRD: Give me the steps to solve my question correctly, identifying the correct answer as {correct_answer} in the final step.""",
             },
         ],
     },

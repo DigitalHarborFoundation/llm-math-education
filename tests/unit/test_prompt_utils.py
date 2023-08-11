@@ -103,6 +103,9 @@ def test_identify_slots():
     slots = prompt_utils.PromptManager.identify_slots("test {test1} {test2} {test3 }")
     assert slots == ["test1", "test2"]
 
+    slots = prompt_utils.PromptManager.identify_slots("test {test1} {test1}")
+    assert slots == ["test1"]
+
 
 def test_user_query_replacement():
     test_intro_messages = [
