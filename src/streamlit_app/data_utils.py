@@ -57,51 +57,61 @@ def create_hint_default_retrieval_slot_map() -> dict[str, retrieval.DbInfo]:
     return slot_map
 
 
+def create_mathqa_retrieval_options_map(
+    retrieval_db_map: dict[str, retrieval.RetrievalDb],
+) -> dict[str, retrieval_strategies.RetrievalStrategy]:
+    if any([db_name not in retrieval_db_map for db_name in DB_NAME_LIST]):
+        # missing needed db data
+        retrieval_options_map = {key: retrieval_strategies.NoRetrievalStrategy() for key in RETRIEVAL_OPTIONS_LIST}
+    else:
+        rori_microlesson_db_info = retrieval.DbInfo(
+            retrieval_db_map["rori_microlesson"],
+            max_tokens=2000,
+            prefix="Here is some lesson content that might be relevant:\n",
+        )
+        openstax_subsection_db_info = retrieval.DbInfo(
+            retrieval_db_map["openstax_subsection"],
+            max_tokens=2000,
+            prefix="Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
+        )
+        rori_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+            {
+                "rori_microlesson_texts": rori_microlesson_db_info,
+            },
+        )
+        openstax_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+            {
+                "openstax_subsection_texts": openstax_subsection_db_info,
+            },
+        )
+        both_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+            {
+                "rori_microlesson_texts": rori_microlesson_db_info.copy(max_tokens=1000),
+                "openstax_subsection_texts": openstax_subsection_db_info.copy(max_tokens=1000),
+            },
+        )
+        retrieval_options_map = {
+            RETRIEVAL_OPTIONS_LIST[0]: both_strategy,
+            RETRIEVAL_OPTIONS_LIST[1]: rori_only_strategy,
+            RETRIEVAL_OPTIONS_LIST[2]: openstax_only_strategy,
+            RETRIEVAL_OPTIONS_LIST[3]: retrieval_strategies.NoRetrievalStrategy(),
+        }
+    return retrieval_options_map
+
+
 def cache_retrieval_data_in_session() -> bool:
     if "retrieval_db_map" not in st.session_state:
         st.session_state.retrieval_db_map = create_retrieval_db_map()
     was_data_loaded = False
     if "retrieval_options_map" not in st.session_state:
-        if any([db_name not in st.session_state.retrieval_db_map for db_name in DB_NAME_LIST]):
-            # missing needed db data
+        retrieval_options_map = create_mathqa_retrieval_options_map(st.session_state.retrieval_db_map)
+        if all(
+            type(retrieval_strategy) is retrieval_strategies.NoRetrievalStrategy
+            for retrieval_strategy in retrieval_options_map.values()
+        ):
+            # assume loading failed if EVERY retrieval option is NoRetrieval
             st.warning("Error loading retrieval data; performance may be degraded.")
-            st.session_state.retrieval_options_map = {
-                key: retrieval_strategies.NoRetrievalStrategy() for key in RETRIEVAL_OPTIONS_LIST
-            }
-        else:
-            rori_microlesson_db_info = retrieval.DbInfo(
-                st.session_state.retrieval_db_map["rori_microlesson"],
-                max_tokens=2000,
-                prefix="Here is some lesson content that might be relevant:\n",
-            )
-            openstax_subsection_db_info = retrieval.DbInfo(
-                st.session_state.retrieval_db_map["openstax_subsection"],
-                max_tokens=2000,
-                prefix="Here are some excerpts from a math textbook. If they are relevant to the question, feel free to use language or examples from these excerpts:\n",
-            )
-            rori_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
-                {
-                    "rori_microlesson_texts": rori_microlesson_db_info,
-                },
-            )
-            openstax_only_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
-                {
-                    "openstax_subsection_texts": openstax_subsection_db_info,
-                },
-            )
-            both_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
-                {
-                    "rori_microlesson_texts": rori_microlesson_db_info.copy(max_tokens=1000),
-                    "openstax_subsection_texts": openstax_subsection_db_info.copy(max_tokens=1000),
-                },
-            )
-            retrieval_options_map = {
-                RETRIEVAL_OPTIONS_LIST[0]: both_strategy,
-                RETRIEVAL_OPTIONS_LIST[1]: rori_only_strategy,
-                RETRIEVAL_OPTIONS_LIST[2]: openstax_only_strategy,
-                RETRIEVAL_OPTIONS_LIST[3]: retrieval_strategies.NoRetrievalStrategy(),
-            }
-            st.session_state.retrieval_options_map = retrieval_options_map
+        st.session_state.retrieval_options_map = retrieval_options_map
         was_data_loaded = True
     return was_data_loaded
 
