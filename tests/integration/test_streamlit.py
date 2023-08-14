@@ -1,12 +1,16 @@
 # Integration tests for the streamlit app,
 # including testing some of the associated utilities in `streamlit_app`
 
+import conftest
+
 from llm_math_education import prompt_utils, retrieval_strategies
 from llm_math_education.prompts import hints as hint_prompts
 from streamlit_app import auth_utils, data_utils
 
 
-def test_hint_generation():
+def test_hint_generation(monkeypatch):
+    monkeypatch.setattr("llm_math_education.embedding_utils.get_openai_embeddings", conftest.mock_get_openai_embeddings)
+
     hint_prompt_manager = prompt_utils.PromptManager()
     slot_map = data_utils.create_hint_default_retrieval_slot_map()
     retrieval_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map)
