@@ -360,6 +360,25 @@ files = [
 ]
 
 [[package]]
+name = "beartype"
+version = "0.15.0"
+description = "Unbearably fast runtime type checking in pure Python."
+category = "dev"
+optional = false
+python-versions = ">=3.8.0"
+files = [
+    {file = "beartype-0.15.0-py3-none-any.whl", hash = "sha256:52cd2edea72fdd84e4e7f8011a9e3007bf0125c3d6d7219e937b9d8868169177"},
+    {file = "beartype-0.15.0.tar.gz", hash = "sha256:2af6a8d8a7267ccf7d271e1a3bd908afbc025d2a09aa51123567d7d7b37438df"},
+]
+
+[package.extras]
+all = ["typing-extensions (>=3.10.0.0)"]
+dev = ["autoapi (>=0.9.0)", "coverage (>=5.5)", "mypy (>=0.800)", "numpy", "pandera", "pydata-sphinx-theme (<=0.7.2)", "pytest (>=4.0.0)", "sphinx", "sphinx (>=4.2.0,<6.0.0)", "sphinxext-opengraph (>=0.7.5)", "tox (>=3.20.1)", "typing-extensions (>=3.10.0.0)"]
+doc-rtd = ["autoapi (>=0.9.0)", "pydata-sphinx-theme (<=0.7.2)", "sphinx (>=4.2.0,<6.0.0)", "sphinxext-opengraph (>=0.7.5)"]
+test-tox = ["mypy (>=0.800)", "numpy", "pandera", "pytest (>=4.0.0)", "sphinx", "typing-extensions (>=3.10.0.0)"]
+test-tox-coverage = ["coverage (>=5.5)"]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.12.2"
 description = "Screen-scraping library"
@@ -770,6 +789,18 @@ files = [
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[[package]]
+name = "cloudpickle"
+version = "2.2.1"
+description = "Extended pickling support for Python objects"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "cloudpickle-2.2.1-py3-none-any.whl", hash = "sha256:61f594d1f4c295fa5cd9014ceb3a1fc4a70b0de1164b94fbc2d854ccba056f9f"},
+    {file = "cloudpickle-2.2.1.tar.gz", hash = "sha256:d89684b8de9e34a2a43b3460fbca07d09d6e25ce858df4d5a44240403b6178f5"},
+]
 
 [[package]]
 name = "colorama"
@@ -1725,6 +1756,25 @@ files = [
 pyreadline3 = {version = "*", markers = "sys_platform == \"win32\" and python_version >= \"3.8\""}
 
 [[package]]
+name = "icontract"
+version = "2.6.2"
+description = "Provide design-by-contract with informative violation messages."
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "icontract-2.6.2-py3-none-any.whl", hash = "sha256:1a441dad41c9a0615c6ae96464190eddccd2de8153254059ff18ffd7b3b84800"},
+    {file = "icontract-2.6.2.tar.gz", hash = "sha256:b87d2b33eb5d7f2c9a5af4770d6d106560c9688c79a821e5fe1bbd41188f5dcc"},
+]
+
+[package.dependencies]
+asttokens = ">=2,<3"
+typing-extensions = "*"
+
+[package.extras]
+dev = ["astor (==0.8.1)", "asyncstdlib (==3.9.1)", "coverage (>=4.5.1,<5)", "deal (==4.23.3)", "docutils (>=0.14,<1)", "dpcontracts (==0.6.0)", "mypy (==0.971)", "numpy (>=1,<2)", "py-cpuinfo (>=5.0.0,<6)", "pydocstyle (>=6.1.1,<7)", "pygments (>=2.2.0,<3)", "pylint (==2.13.9)", "tabulate (>=0.8.7,<1)", "tox (>=3.0.0)", "typeguard (>=2,<3)", "yapf (==0.20.2)"]
+
+[[package]]
 name = "identify"
 version = "2.5.26"
 description = "File identification library for Python"
@@ -1793,6 +1843,18 @@ python-versions = ">=3.7"
 files = [
     {file = "installer-0.6.0-py3-none-any.whl", hash = "sha256:ae7c62d1d6158b5c096419102ad0d01fdccebf857e784cee57f94165635fe038"},
     {file = "installer-0.6.0.tar.gz", hash = "sha256:f3bd36cd261b440a88a1190b1becca0578fee90b4b62decc796932fdd5ae8839"},
+]
+
+[[package]]
+name = "interegular"
+version = "0.3.2"
+description = "a regex intersection checker"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "interegular-0.3.2-py36-none-any.whl", hash = "sha256:548be87262bc041b01298c0e35afb69c5b7513425b6cce35db2fa140ede3db60"},
+    {file = "interegular-0.3.2.tar.gz", hash = "sha256:ea4645abace93d9f39d341205686a60b79777a43d94400933effb9c8f2901825"},
 ]
 
 [[package]]
@@ -2476,6 +2538,24 @@ files = [
 
 [package.extras]
 data = ["language-data (>=1.1,<2.0)"]
+
+[[package]]
+name = "lark"
+version = "1.1.7"
+description = "a modern parsing library"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "lark-1.1.7-py3-none-any.whl", hash = "sha256:9e5dc5bbf93fa1840083707285262514a0ef8a6613874af7ea1cec60468d6e92"},
+    {file = "lark-1.1.7.tar.gz", hash = "sha256:be7437bf1f37ab08b355f29ff2571d77d777113d0a8c4352b0c513dced6c5a1e"},
+]
+
+[package.extras]
+atomic-cache = ["atomicwrites"]
+interegular = ["interegular (>=0.3.1,<0.4.0)"]
+nearley = ["js2py"]
+regex = ["regex"]
 
 [[package]]
 name = "lightgbm"
@@ -3306,6 +3386,34 @@ files = [
 et-xmlfile = "*"
 
 [[package]]
+name = "outlines"
+version = "0.0.8"
+description = "Probabilistic Generative Model Programming"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "outlines-0.0.8-py3-none-any.whl", hash = "sha256:6f26000ba32aa2af67764e2b398d758567d1cdda18caceb7cebd2e8bc4b14b3c"},
+    {file = "outlines-0.0.8.tar.gz", hash = "sha256:3157dbace3b6fbf95a465f68a6236bd6fa88f62a45ae1d838800b003fd03e3d2"},
+]
+
+[package.dependencies]
+interegular = "*"
+jinja2 = "*"
+lark = "*"
+numpy = "*"
+perscache = "*"
+pillow = "*"
+pydantic = "*"
+regex = "*"
+scipy = "*"
+tenacity = "*"
+torch = "*"
+
+[package.extras]
+test = ["coverage[toml] (>=5.1)", "diff-cover", "diffusers", "interegular", "lark", "pre-commit", "pydantic (>=2.0)", "pytest", "pytest-cov", "regex", "transformers"]
+
+[[package]]
 name = "overrides"
 version = "7.3.1"
 description = "A decorator to automatically detect mismatch when overriding a method."
@@ -3458,6 +3566,23 @@ azure = ["azure-storage-blob"]
 gcs = ["google-cloud-storage (>=1.26.0,<2.0.0)"]
 s3 = ["boto3"]
 test = ["mock", "pytest", "pytest-coverage", "typer-cli"]
+
+[[package]]
+name = "perscache"
+version = "0.6.1"
+description = "An easy to use decorator for persistent memoization: like `functools.lrucache`, but results can be saved in any format to any storage."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "perscache-0.6.1-py2.py3-none-any.whl", hash = "sha256:89468fc40be5b3c252a34505843e3691abd06bd0bb37887a98fdcb4d20bdcfee"},
+    {file = "perscache-0.6.1.tar.gz", hash = "sha256:1bb2f5f67b8cc137b2c5a2ccbe7c7a3e6dc5e9a72bcf355689a2a9f2a4513047"},
+]
+
+[package.dependencies]
+beartype = "*"
+cloudpickle = "*"
+icontract = "*"
 
 [[package]]
 name = "pexpect"
@@ -6443,4 +6568,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "5b2708ea2ce03f60a91aa74d53361da7f03d7d516562f4511c1a422a9ff4dce0"
+content-hash = "0463206333567d0c4a32c0caf267af1b0eff012b5cf978032982e3cfec718aaf"
