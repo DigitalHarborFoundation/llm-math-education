@@ -85,7 +85,11 @@ def test_DbInfo_get_parent_text(retrieval_db):
         parent_group_cols=["group_var"],
         parent_sort_cols=["categorical_var"],
     )
-    text, n_tokens, used_inds = db_info.get_parent_text(0)
+    # first, verify that with a budget of 0 no texts are returned
+    assert db_info.get_parent_text(0, 0) is None
+
+    # second, verify normal case
+    text, n_tokens, used_inds = db_info.get_parent_text(0, 1000)
     assert used_inds == {0, 1}
     expected_parent_rows = db_info.db.df[db_info.db.df["group_var"] == 1]
     expected_text = "\n".join(expected_parent_rows[db_info.db.embed_col])
@@ -102,3 +106,16 @@ def test_DbInfo_get_parent_text(retrieval_db):
     distances = np.array([0, 0, 1])
     fill_string = db_info.get_fill_string_from_distances(distances)
     assert len(re.findall(expected_text, fill_string)) == 1, f"Duplicate retrieval in {fill_string}"
+
+    # third, we verify token budget backoff behavior
+    # here, we give only enough budget to get the target text
+    token_budget = db_info.db.df[db_info.db.n_tokens_col].iloc[0]
+    text, n_tokens, used_inds = db_info.get_parent_text(0, token_budget)
+    assert text == db_info.db.df[db_info.db.embed_col].iloc[0]
+    assert n_tokens == token_budget
+    assert used_inds == {0}
+
+    # here, we give enough budget for two texts
+    token_budget = db_info.db.df[db_info.db.n_tokens_col].iloc[0:1].sum()
+    text, n_tokens, used_inds = db_info.get_parent_text(0, token_budget)
+    assert len(used_inds - {0, 1}) == 0

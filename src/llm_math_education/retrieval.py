@@ -154,7 +154,8 @@ class DbInfo:
             if ind in used_inds:
                 continue
             if self.use_parent_text:
-                text, n_tokens, new_used_inds = self.get_parent_text(ind)
+                token_budget = self.max_tokens - total_tokens
+                text, n_tokens, new_used_inds = self.get_parent_text(ind, token_budget)
                 used_inds.update(new_used_inds)
             else:
                 text, n_tokens = self.get_single_text(ind)
@@ -174,7 +175,7 @@ class DbInfo:
         n_tokens = row[self.db.n_tokens_col]
         return text, n_tokens
 
-    def get_parent_text(self, ind: int):
+    def get_parent_text(self, ind: int, token_budget: int):
         """
         Intuition of "parent document" retriever is to retrieve for inclusion in a prompt the "parent" document,
         similar to including docs on either "side" as additional context.
@@ -193,12 +194,29 @@ class DbInfo:
         parent = df[and_cond]
         if self.parent_sort_cols is not None and len(self.parent_sort_cols) > 1:
             parent = parent.sort_values(by=self.parent_sort_cols)
-        new_used_inds = set(np.nonzero(and_cond)[0])
+        # include a variable amount of context based on the given token_budget
+        # preference ranking implemented here:
+        #  - all docs
+        #  - up to token_budget docs from target_ind - 0
+        total_tokens = parent[self.db.n_tokens_col].sum()
+        if row[self.db.n_tokens_col] > token_budget:
+            # simple case: NOTHING will fit in the token budget!
+            return None
+        elif total_tokens <= token_budget:
+            # simple case: if all tokens in budget, no extra work
+            rows = parent
+        else:
+            target_ind_val = df.index[ind]
+            before = parent.loc[:target_ind_val]
+            # see: https://stackoverflow.com/a/37872823
+            cumulative_token_counts = before.loc[::-1, self.db.n_tokens_col].cumsum()[::-1]
+            rows = before[cumulative_token_counts <= token_budget]
+        assert len(rows) >= 1
+        new_used_inds = {df.index.get_loc(new_ind) for new_ind in rows.index}
         assert ind in new_used_inds
-        texts = parent[self.db.embed_col]
-        n_tokens_rows = parent[self.db.n_tokens_col]
+        texts = rows[self.db.embed_col]
+        n_tokens_rows = rows[self.db.n_tokens_col]
         text = self.parent_join_string.join(texts)
-        n_tokens = (
-            n_tokens_rows.sum()
-        )  # note this will underestimate the true number of tokens, due to whatever parent_join_string is
+        # note this will underestimate the true number of tokens, due to whatever parent_join_string is
+        n_tokens = n_tokens_rows.sum()
         return text, n_tokens, new_used_inds
