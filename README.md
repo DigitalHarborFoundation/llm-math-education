@@ -1,6 +1,6 @@
 # llm-math-education: LLMs for Middle-School Math Question-Answering
 
-How can we incorporate external math knowledge from trusted sources in generated answers to student questions?
+How can we incorporate trusted, external math knowledge in generated answers to student questions?
 
 The `llm-math-education` package implements basic retrieval augmented generation (RAG) and contains prompts for two primary use cases: general math question-answering (QA) and hint generation. It is currently designed to work only with the OpenAI generative chat API.
 
@@ -16,11 +16,9 @@ The `llm-math-education` package is [available on PyPI](https://pypi.org/project
 pip install llm-math-education
 ```
 
-## Basic usage
+## Usage
 
-These examples can be seen together in [src/usage_demo.py](/src/usage_demo.py).
-
-Assuming that `OPENAI_API_KEY` is provided as an environment variable or set via `openai.api_key = your_api_key`.
+We assume that `OPENAI_API_KEY` is provided as an environment variable or set via `openai.api_key = your_api_key`.
 
 Preliminary setup: specify a directory in which to save the embedding database.
 ```python
@@ -34,10 +32,14 @@ We'll use `llm-math-education` to answer a student question.
 student_question = "How do I identify common factors?"
 ```
 
-### Retrieval augmented generation data
+These usage examples can be seen together in [src/usage_demo.py](/src/usage_demo.py).
+
+### Acquiring textbook data for retrieval augmented generation
 
 To do retrieval augmented generation, we need data.
 We'll use an OpenStax Pre-algebra textbook as our retrieval data.
+
+Note: the `llm_math_education.openstax` module relies on `requests` and `beautifulsoup4`, which are not listed as dependencies. Install them yourself with `pip` if you want to download and parse OpenStax textbooks.
 
 ```python
 from llm_math_education import openstax
@@ -49,7 +51,9 @@ df = openstax.get_subsection_dataframe(textbook_data)
 Index(['title', 'content', 'index', 'chapter', 'section'], dtype='object')
 ```
 
-### Create an embedding lookup database from a dataframe
+The parsing code is probably very brittle; it has only been tested with the Pre-algebra textbook.
+
+### Creating an embedding lookup database from a dataframe
 
 ```python
 from llm_math_education import retrieval
@@ -60,7 +64,7 @@ openstax_db.create_embeddings()
 openstax_db.save_df()
 ```
 
-### Load an existing embedding database
+### Loading an existing embedding database
 
 Here, we compute the "distance" in embedding space between the student question and the documents in the database.
 
@@ -136,7 +140,7 @@ assistant_message = completion["choices"][0]["message"]
 }
 ```
 
-#### PromptManager for follow-ups
+#### Using PromptManager for multi-turn chat conversations
 
 Add stored messages to continue the conversation.
 
@@ -151,13 +155,12 @@ Clear stored messages to start a new conversation on the next call to `build_que
 pm.clear_stored_messages()
 ```
 
-### Use built-in prompts for math QA or hint generation
+### Using built-in prompts for math QA or hint generation
 
 ```python
 from llm_math_education.prompts import mathqa as mathqa_prompts
 pm.set_intro_messages(mathqa_prompts.intro_prompts["general_math_qa_intro"])
 ```
-
 
 ## Development
 
