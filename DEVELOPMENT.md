@@ -94,3 +94,19 @@ Verify password: abc
 ```
 
 If the AUTH_TOKEN is provided in the secrets, can authenticate automatically via URL parameter, e.g. `{base_url}?auth_token=abc`.
+
+## Data
+
+The Streamlit demo draws on data from a few sources.
+
+### OpenStax
+
+OpenStax is a Rice University project to make high-quality math textbooks available (under a CC BY 4.0 license). Access for free at https://openstax.org.
+
+### Rori
+
+[Rori](https://rori.ai/) is a project of [Rising Academies](https://www.risingacademies.com/). Micro-lessons help students learn at their level.
+
+### Math Nation
+
+[Math Nation](https://www.mathnation.com/about/history-mission/) is an interactive math tool for middle and high school math. Student questions asked in pre-algebra and algebra forums are a high-validity example of general QA questions asked by middle-school math students.
