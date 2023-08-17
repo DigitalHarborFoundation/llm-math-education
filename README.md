@@ -1,87 +1,167 @@
-# LLMs for Middle-School Math Question-Answering
+# llm-math-education: LLMs for Middle-School Math Question-Answering
 
-External math knowledge for math QA.
+How can we incorporate trusted, external math knowledge in generated answers to student questions?
 
-## Local development setup
+The `llm-math-education` package implements basic retrieval augmented generation (RAG) and contains prompts for two primary use cases: general math question-answering (QA) and hint generation. It is currently designed to work only with the OpenAI generative chat API.
 
-### First-time setup
+This project is [hosted on GitHub](https://github.com/levon003/llm-math-education).
+Feel free to open an [issue](https://github.com/levon003/llm-math-education/issues) with questions, comments, or requests.
 
-This repository uses Conda to manage two dependencies: Python and Poetry. ([This SO post](https://stackoverflow.com/a/71110028) provides more context on using Conda and Poetry together.)
 
-Install conda or miniconda. Then, create the needed environment, called `llm-math-education`.
+## Installation
 
-```bash
-conda env create -f environment.yml
-```
-
-### Python development
-
-1. Activate the conda environment: `conda activate llm-math-education`
-2. Use `make install` to install all needed dependencies (including the pre-commit hooks).
-
-Ideally, the Makefile would activate the needed conda environment, but I don't actually know enough `make` to add that.
-
-### OpenAI API env variable
-
-Create a `.env` file in the project root with your OpenAI API key defined as an environment variable inside it:
+The `llm-math-education` package is [available on PyPI](https://pypi.org/project/llm-math-education/).
 
 ```bash
-echo "OPENAI_API_KEY={your-api-key-here}" > .env
+pip install llm-math-education
 ```
 
-### Run tests
+## Usage
 
-```bash
-make test
+We assume that `OPENAI_API_KEY` is provided as an environment variable or set via `openai.api_key = your_api_key`.
+
+Preliminary setup: specify a directory in which to save the embedding database.
+```python
+from pathlib import Path
+demo_dir = Path("data") / "demo"
+demo_dir.mkdir(exist_ok=True)
 ```
 
-### Other useful commands
-
- - `poetry run <command>` - Run the given command, e.g. `poetry run pytest` invokes the tests.
- - `source $(poetry env info --path)/bin/activate` - An alternative to `poetry shell` that's less buggy in conda environments.
- - `poetry add <package>` - Add the given package as a dependency. Use flag `-G dev` to add it as a development dependency.
- - `conda remove -n llm-math-education --all` - Tear it all down, so first-time setup can be repeated.
-
-### Anserini support
-
-To use Pyserini, need to install a few additional things.
-
-First, Java 7+ JDK should be installed and configured reasonably. I installed the latest build (JDK 20.0.1) with no issues.
-
-To install NMSLib: (see [issue](https://github.com/nmslib/nmslib/issues/476))
-    CFLAGS="-mavx -DWARN(a)=(a)" pip install --use-pep517 nmslib
-
-Ultimately, I added it to a new dependency group (`anserini`) like so:
-    CFLAGS="-mavx -DWARN(a)=(a)" poetry add nmslib -G anserini
-
-This likely means that rebuilds won't succeed without first installing nmslib with these CFLAGS, although I haven't tested it. Use `poetry install --with anserini` to include during a build.
-
-FAISS (needed for Pyserini) installed in the outer conda environment:
-    conda install -c pytorch faiss-cpu
-
-I did not include the FAISS dependency in `environment.yaml`.
-
-### Streamlit
-
-A few notes about the app.
-
-#### Authentication
-
-For local development, streamlit secrets need to be stored in `.streamlit/secrets.toml`
-
-Here's a sample file:
-```
-OPENAI_API_KEY = "{key goes here}"
-AUTH_TOKEN = "argon2:$argon2id$v=19$m=10240,t=10,p=8$MuVIOw20jkOi1nKR90hPhA$H22nY8aNyfztLYQCSj5NRw5/Cy2WOo6kl3K61RyaoZY"
+We'll use `llm-math-education` to answer a student question.
+```python
+student_question = "How do I identify common factors?"
 ```
 
-To generate the auth_token:
-```
->>> import notebook.auth.security
->>> notebook.auth.security.passwd()
-Enter password: abc
-Verify password: abc
-'argon2:$argon2id$v=19$m=10240,t=10,p=8$MuVIOw20jkOi1nKR90hPhA$H22nY8aNyfztLYQCSj5NRw5/Cy2WOo6kl3K61RyaoZY'
+These usage examples can be seen together in [src/usage_demo.py](/src/usage_demo.py).
+
+### Acquiring textbook data for retrieval augmented generation
+
+To do retrieval augmented generation, we need data.
+We'll use an OpenStax Pre-algebra textbook as our retrieval data.
+
+Note: the `llm_math_education.openstax` module relies on `requests` and `beautifulsoup4`, which are not listed as dependencies. Install them yourself with `pip` if you want to download and parse OpenStax textbooks.
+
+```python
+from llm_math_education import openstax
+prealgebra_textbook_url = "https://openstax.org/books/prealgebra-2e/pages/1-introduction"
+textbook_data = openstax.cache_openstax_textbook_contents(prealgebra_textbook_url, demo_dir / "openstax")
+df = openstax.get_subsection_dataframe(textbook_data)
+
+>>> df.columns
+Index(['title', 'content', 'index', 'chapter', 'section'], dtype='object')
 ```
 
-If the AUTH_TOKEN is provided in the secrets, can authenticate automatically via URL parameter, e.g. `{base_url}?auth_token=abc`.
+The parsing code is probably very brittle; it has only been tested with the Pre-algebra textbook.
+
+### Creating an embedding lookup database from a dataframe
+
+```python
+from llm_math_education import retrieval
+db_name = "openstax_prealgebra"
+text_column_to_embed = "content"
+openstax_db = retrieval.RetrievalDb(demo_dir, db_name, text_column_to_embed, df)
+openstax_db.create_embeddings()
+openstax_db.save_df()
+```
+
+### Loading an existing embedding database
+
+Here, we compute the "distance" in embedding space between the student question and the documents in the database.
+
+```python
+openstax_db = retrieval.RetrievalDb(demo_dir, "openstax_prealgebra", "content")
+distances = openstax_db.compute_string_distances(student_question)
+
+>>> distances
+[0.21348877 0.24298186 0.25825211 ... 0.25500673 0.24491884 0.22458498]
+```
+
+### Using the database to do retrieval augmented generation
+
+#### Defining a retrieval strategy
+
+```python
+from llm_math_education import retrieval_strategies
+db_info = retrieval.DbInfo(
+    openstax_db,
+    max_texts=1,
+)
+strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(
+    {
+        "openstax_section": db_info,
+    },
+)
+```
+
+The key in the dictionary passed to the `MappedEmbedding` retrieval strategy identifies the key to be replaced in the prompt, in Python string formatting notation.
+
+#### Starting a chat conversation with RAG
+
+We'll use a `PromptManager` to build chat messages from a prompt, a retrieval strategy, and a user query.
+
+```python
+from llm_math_education import prompt_utils
+pm = prompt_utils.PromptManager()
+pm.set_retrieval_strategy(strategy)
+pm.set_intro_messages(
+    [
+        {
+            "role": "user",
+            "content": """Answer this question: {user_query}
+
+Reference this text in your answer:
+{openstax_section}""",
+        },
+    ],
+)
+messages = pm.build_query(student_question)
+
+>>> messages
+[{'role': 'user', 'content': 'Answer this question: How do I identify common factors?'
+''
+'Reference this text in your answer:'
+'We will now look at an expression containing a product that is raised to a power. Look for a pattern. The exponent applies to each of the factors. This leads to the Product to a Power Property for Exponents. An example with numbers helps to verify this property:'}]
+```
+
+We can pass the formatted messages to the OpenAI API.
+
+```python
+import openai
+completion = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo-0613",
+    messages=messages,
+)
+assistant_message = completion["choices"][0]["message"]
+
+>>> assistant_message
+{
+  "role": "assistant",
+  "content": "To identify common factors, you need to look for a pattern in an expression containing a product raised to a power. The exponent applies to each of the factors in this case. \n\nFor example, let's consider the expression (ab)^2. Here, (ab) is the product, and the exponent 2 applies to both 'a' and 'b'. To identify the common factors, you can separate the product into its individual factors:\n\n(ab)^2 = ab * ab\n\nNow, you can see that both 'a' and 'b' appear as factors in the expression. Therefore, 'a' and 'b' are the common factors. By identifying the factors that appear in multiple terms, you can determine the common factors of an expression.\n\nUsing numbers to verify this property, suppose we have the expression (2*3)^2, which simplifies to (6)^2. In this case, the common factor is 6, as both 2 and 3 are factors of 6."
+}
+```
+
+#### Using PromptManager for multi-turn chat conversations
+
+Add stored messages to continue the conversation.
+
+```python
+pm.add_stored_message(assistant_message)
+messages = pm.build_query("I have a follow-up question...")
+```
+
+Clear stored messages to start a new conversation on the next call to `build_query()`.
+
+```python
+pm.clear_stored_messages()
+```
+
+### Using built-in prompts for math QA or hint generation
+
+```python
+from llm_math_education.prompts import mathqa as mathqa_prompts
+pm.set_intro_messages(mathqa_prompts.intro_prompts["general_math_qa_intro"])
+```
+
+## Development
+
+See the [developer's guide](/DEVELOPMENT.md).
