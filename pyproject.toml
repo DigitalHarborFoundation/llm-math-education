@@ -40,6 +40,9 @@ jupyterlab = "^4.0.2"
 pytest-dotenv = "^0.5.2"
 torch = "^2.0.1"
 outlines = "^0.0.8"
+sqlalchemy = "^2.0.20"
+psycopg2-binary = "^2.9.7"
+supabase = "^1.0.4"
 
 [tool.poetry.group.anserini]
 optional = true

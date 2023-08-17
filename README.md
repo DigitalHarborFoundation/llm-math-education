@@ -21,6 +21,15 @@ conda env create -f environment.yml
 
 Ideally, the Makefile would activate the needed conda environment, but I don't actually know enough `make` to add that.
 
+### Python releases
+
+To deploy to PyPI, set your API token and deploy (see [guide](https://www.digitalocean.com/community/tutorials/how-to-publish-python-packages-to-pypi-using-poetry-on-ubuntu-22-04)):
+```bash
+poetry config pypi-token.pypi "{your API token generated on pypi.org}"
+poetry build
+poetry publish
+```
+
 ### OpenAI API env variable
 
 Create a `.env` file in the project root with your OpenAI API key defined as an environment variable inside it:
