@@ -24,6 +24,7 @@ else:
     import pandas as pd
 
     df = pd.read_json(df_filepath)
+print(df.columns)
 
 from llm_math_education import retrieval
 
