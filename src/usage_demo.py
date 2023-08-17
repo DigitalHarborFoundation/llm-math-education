@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import dotenv
-import pandas as pd
 
 dotenv.load_dotenv(".env")
 
@@ -22,6 +21,8 @@ if not df_filepath.exists():
     df = df.sample(n=10)
     df.to_json(df_filepath)
 else:
+    import pandas as pd
+
     df = pd.read_json(df_filepath)
 
 from llm_math_education import retrieval
