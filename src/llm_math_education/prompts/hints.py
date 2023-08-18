@@ -12,7 +12,10 @@ The following paragraphs are examples of content that may or not be relevant in 
             },
             {
                 "role": "user",
-                "content": """Provide a hint for this math question:
+                "content": """I just received this math lesson:
+{lesson}
+
+Provide a hint for this math question:
 {question}
 
 I answered {incorrect_answer}, which is incorrect. Generate four hints for the correct answer {correct_answer} by following the steps below:
@@ -23,7 +26,7 @@ SECOND: Tell me what information I need to accomplish the goal.
 
 THIRD: Tell me what mathematical computation I need to do using the information I have to accomplish the goal.
 
-FOURTH: Tell me how to do the mathematical computation and show that it results in the correct answer {correct_answer}.""",
+FOURTH: Tell me how to do the mathematical computation and show that it results in the correct answer "{correct_answer}".""",
             },
         ],
     },
@@ -40,7 +43,10 @@ The following paragraphs are examples of content that may or not be relevant in 
             },
             {
                 "role": "user",
-                "content": """Provide a hint for this math question:
+                "content": """I just received this math lesson:
+{lesson}
+
+Provide a hint for this math question:
 {question}
 
 The correct answer is {correct_answer}, but I answered {incorrect_answer}.
