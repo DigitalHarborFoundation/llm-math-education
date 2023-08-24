@@ -1,16 +1,18 @@
 from llm_math_education import logit_bias
 
+THE_TOKEN = 1820  # token for string "the"
+
 
 def test_get_tokenizer():
     tokenizer = logit_bias.get_tokenizer()
     assert tokenizer.encode("the") == [1820]
-    assert tokenizer.decode([1820]) == "the"
+    assert tokenizer.decode([THE_TOKEN]) == "the"
 
 
 def test_load_stopwords():
     stopword_tokens = logit_bias.load_stopword_tokens()
     assert len(stopword_tokens) >= 11000
-    assert 1820 in stopword_tokens, "The 'the' token (1820) should be in the stopwords."
+    assert THE_TOKEN in stopword_tokens, "The 'the' token (1820) should be in the stopwords."
     assert stopword_tokens == logit_bias.get_stopword_tokens()
     # test caching
     assert logit_bias.get_stopword_tokens() == logit_bias.get_stopword_tokens()
@@ -45,3 +47,10 @@ def test_get_logit_bias_from_slot():
     logit_bias_dict = logit_bias.get_logit_bias_from_slot(recent_slot_fill_dict)
     assert 1570 in logit_bias_dict
     # TODO make this test cover more cases and be more explanatory
+
+
+def test_create_stopword_token_set_from_word_list():
+    word_list = ["the"]
+    stopword_tokens = logit_bias.create_stopword_token_set_from_word_list(word_list)
+    assert len(stopword_tokens) > 1
+    assert THE_TOKEN in stopword_tokens

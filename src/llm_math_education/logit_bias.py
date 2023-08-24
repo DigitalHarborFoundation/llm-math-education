@@ -6,6 +6,7 @@ import functools
 import importlib.resources
 import json
 import re
+import string as string_utils
 from collections import Counter
 
 import tiktoken
@@ -29,6 +30,26 @@ def load_stopword_tokens() -> set[int]:
     with resource_filepath.open("r") as infile:
         stopwords_dict = json.load(infile)
     return set(stopwords_dict["stopword_tokens"])
+
+
+def create_stopword_token_set_from_word_list(word_list: list[str]):
+    tokenizer = get_tokenizer()
+    stopword_tokens = set()
+    stopwords = (
+        word_list
+        + list(map(str.lower, word_list))
+        + list(map(str.upper, word_list))
+        + list(map(str.capitalize, word_list))
+        + list(string_utils.whitespace)
+        + list(string_utils.punctuation)
+    )
+    for word in stopwords:
+        for char in string_utils.whitespace + string_utils.punctuation:
+            for string in [word, char + word, word + char]:
+                tokens = tokenizer.encode(string)
+                if len(tokens) == 1:
+                    stopword_tokens.add(tokens[0])
+    return stopword_tokens
 
 
 def get_nonstopword_tokens(text: str) -> list[int]:
