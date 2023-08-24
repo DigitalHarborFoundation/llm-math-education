@@ -11,7 +11,7 @@ This repository uses Conda to manage two dependencies: Python and Poetry. ([This
 Install conda or miniconda. Then, create the needed environment, called `llm-math-education`.
 
 ```bash
-conda env create -f environment.yml
+conda env create -f conda-environment.yml
 ```
 
 ### Python development
