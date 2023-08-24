@@ -33,3 +33,15 @@ def test_get_logit_bias():
     logit_bias_dict = logit_bias.get_logit_bias(tokens, min_count=3)
     assert len(logit_bias_dict) == 1
     assert any([token in logit_bias_dict for token in tokens])
+
+
+def test_get_logit_bias_from_slot():
+    recent_slot_fill_dict = [
+        {
+            "slot1": "verily verily verily",
+            "slot2": "the",
+        },
+    ]
+    logit_bias_dict = logit_bias.get_logit_bias_from_slot(recent_slot_fill_dict)
+    assert 1570 in logit_bias_dict
+    # TODO make this test cover more cases and be more explanatory

@@ -50,10 +50,12 @@ def get_logit_bias(
     max_tokens: int = 50,
     min_bias: float = 1.0,
     max_bias: float = 5.0,
-):
+) -> dict[int, float]:
+    if len(tokens) == 0:
+        return {}
     logit_bias = {}
     c = Counter(tokens).most_common(max_tokens)
-    max_count = c[0][1]
+    max_count = c[0][1]  # count of most-frequently-occurring token
     if max_count >= min_count:
         for token, count in c:
             if count < min_count:
@@ -63,3 +65,30 @@ def get_logit_bias(
             if n_tokens is not None and len(logit_bias) >= n_tokens:
                 break
     return logit_bias
+
+
+def get_logit_bias_from_slot(
+    recent_slot_fill_dict: list[dict[str, str]],
+    include: list[str] | None = None,
+    exclude: list[str] = [],
+    **kwargs,
+) -> dict[int, float]:
+    """Given texts that fill one or more slots, create an appropriate logit_bias.
+    This is probably not a very reasonable way to do to this.
+
+    Args:
+        recent_slot_fill_dict (list[dict[str, str]]): See `prompt_utils.PromptManager`.
+        include (list[str] | None, optional): Slot texts to consider. Defaults to None, meaning all slots are included.
+        exclude (list[str], optional): Slot texts to ignore. Defaults to [].
+
+    Returns:
+        dict[int, float]: logit_bias
+    """
+    texts = []
+    for slot_fill_dict in recent_slot_fill_dict:
+        for key, value in slot_fill_dict.items():
+            if (include is None or key in include) and key not in exclude:
+                texts.append(value)
+    text = "\n".join(texts)
+    tokens = get_nonstopword_tokens(text)
+    return get_logit_bias(tokens, **kwargs)
