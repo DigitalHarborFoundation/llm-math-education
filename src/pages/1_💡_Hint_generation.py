@@ -225,6 +225,6 @@ st.set_page_config(
     page_icon="💡",
 )
 
-if auth_utils.check_is_authorized():
+if auth_utils.check_is_authorized(allow_openai_key=True):
     instantiate_session()
     build_app()

@@ -289,6 +289,6 @@ After each query, the associated prompt is included in a drop-down (including an
 
 
 st.set_page_config(page_title="ChatGPT for middle-school math education", page_icon="🤖")
-if auth_utils.check_is_authorized():
+if auth_utils.check_is_authorized(allow_openai_key=True):
     instantiate_session()
     build_app()
