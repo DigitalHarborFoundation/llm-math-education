@@ -165,7 +165,11 @@ def load_hint_problem_data() -> pd.DataFrame:
     - Incorrect answer
     - Lesson
     """
-    question_df = pd.read_csv(DATA_DIR / "question_sample.csv").sort_values(by=["grade", "topic"])
+    return load_hint_problem_data_from_dir(DATA_DIR)
+
+
+def load_hint_problem_data_from_dir(data_dir: Path):
+    question_df = pd.read_csv(data_dir / "question_sample.csv").sort_values(by=["grade", "topic"])
     # .sort_values(by="question", key=lambda s: s.map(len))
     assert len(question_df) > 1
     question_df["display_name"] = [create_display_name(row) for row in question_df.itertuples()]
