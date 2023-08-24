@@ -16,12 +16,21 @@ from llm_math_education import resources
 
 @functools.cache
 def get_tokenizer(model_name: str = "gpt-3.5-turbo") -> tiktoken.Encoding:
+    """Get the tokenizer. Cached.
+
+    Args:
+        model_name (str, optional): The model tokenizer to load. Defaults to "gpt-3.5-turbo".
+
+    Returns:
+        tiktoken.Encoding: The tiktoken/OpenAI tokenizer.
+    """
     tokenizer = tiktoken.encoding_for_model(model_name)
     return tokenizer
 
 
 @functools.cache
 def get_stopword_tokens():
+    """Cached version of `load_stopword_tokens`."""
     return load_stopword_tokens()
 
 
@@ -32,7 +41,16 @@ def load_stopword_tokens() -> set[int]:
     return set(stopwords_dict["stopword_tokens"])
 
 
-def create_stopword_token_set_from_word_list(word_list: list[str]):
+def create_stopword_token_set_from_word_list(word_list: list[str]) -> set[int]:
+    """Create a set of stopword tokens from the given list of stop words.
+    Used to create the default stopword resource loaded by `load_stopword_tokens`.
+
+    Args:
+        word_list (list[str]): List of words to include in the stopword set.
+
+    Returns:
+        set[int]: Set of stopword tokens.
+    """
     tokenizer = get_tokenizer()
     stopword_tokens = set()
     stopwords = (
@@ -72,6 +90,24 @@ def get_logit_bias(
     min_bias: float = 1.0,
     max_bias: float = 5.0,
 ) -> dict[int, float]:
+    """Given a list of tokens, create a corresponding logit_bias dictionary.
+
+    Roughly, identifies the most frequent max_tokens tokens, stopping at n_tokens if provided,
+    that occur at least min_count times. Bias values are assigned based on frequency, in the range min_bias to max_bias.
+    The most frequent token will always have a weight of max_bias in the resulting logit_bias.
+    Bias defaults are generally inspired by this doc: https://help.openai.com/en/articles/5247780-using-logit-bias-to-define-token-probability
+
+    Args:
+        tokens (list[int]): The list of tokens, e.g. after having stopword tokens removed.
+        min_count (int, optional): Defaults to 2.
+        n_tokens (int | None, optional): Defaults to None.
+        max_tokens (int, optional): Defaults to 50.
+        min_bias (float, optional): Defaults to 1.0.
+        max_bias (float, optional): Defaults to 5.0.
+
+    Returns:
+        dict[int, float]: The logit_bias dict that can be passed to the logit_bias parameter accepted by the OpenAI API.
+    """
     if len(tokens) == 0:
         return {}
     logit_bias = {}

@@ -1,4 +1,5 @@
 # Utilities for parsing OpenStax textbooks into a structured form
+# See README.md for code example
 import re
 import time
 from pathlib import Path

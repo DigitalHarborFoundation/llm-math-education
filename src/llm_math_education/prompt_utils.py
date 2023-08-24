@@ -4,11 +4,14 @@ import re
 
 from llm_math_education import embedding_utils, retrieval_strategies
 
-VALID_ROLES = ["user", "assistant", "system"]
+VALID_ROLES: list[str] = ["user", "assistant", "system"]
 
 
 class PromptSelector:
-    """PromptSelector provides utilities to enumerate and choose prompts."""
+    """PromptSelector provides utilities to enumerate and choose prompts.
+
+    Prompts are stored in dictionaries in the `prompts` modules.
+    """
 
     def __init__(self, intro_prompt_dict: dict):
         self.intro_prompt_dict = intro_prompt_dict
@@ -41,6 +44,16 @@ class PromptSelector:
         return conversation_string
 
     def convert_string_to_conversation(conversation_string: str) -> list[dict[str, str]]:
+        """Given a string representing a conversation, convert into the expected messages list format.
+
+        Follows a pretty basic convention, defined in this implementation.
+
+        Args:
+            conversation_string (str): String representing a conversation.
+
+        Returns:
+            list[dict[str, str]]: List of messages, each with a "role" and "content".
+        """
         messages = []
         message = {
             "content": "",
@@ -97,7 +110,20 @@ class PromptManager:
         user_query: str | None = None,
         previous_messages: list[dict[str, str]] | None = None,
         query_for_retrieval_context: str | None = None,
-    ):
+    ) -> list[dict[str, str]]:
+        """Given a user_query (or the `intro_messages` set on this PromptManager), build a set of messages to pass to the OpenAI API.
+
+        Args:
+            user_query (str | None, optional): If provided, will construct a new user message from this user. Defaults to None.
+            previous_messages (list[dict[str, str]] | None, optional): If provided, will continue a conversation. Defaults to None.
+            query_for_retrieval_context (str | None, optional): If provided, this is used for any RetrievalStrategies that require querying. Defaults to None, meaning the user_query or the most recent user message will be used.
+
+        Raises:
+            KeyError: If the given RetrievalStrategy doesn't fill all the identified slots in the prompts.
+
+        Returns:
+            list[dict[str, str]]: List of messages, to pass to the OpenAI API.
+        """
         if previous_messages is None:
             previous_messages = self.stored_messages
         if len(previous_messages) == 0:
@@ -157,5 +183,15 @@ class PromptManager:
         return total_token_count
 
     def identify_slots(prompt_string: str) -> list[str]:
+        """Uses a regex to identify missing slots in a prompt_string.
+
+        More advanced slot formatting is not supported.
+
+        Args:
+            prompt_string (str): The prompt itself, with format-style slots to fill e.g. "This is a prompt with a slot: {slot_to_fill}"
+
+        Returns:
+            list[str]: List of identified slots.
+        """
         expected_slots = re.findall(r"{[^{} ]+}", prompt_string)
         return sorted({slot[1:-1] for slot in expected_slots})
