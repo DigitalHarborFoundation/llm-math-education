@@ -181,6 +181,17 @@ Other contributors:
 
 1. How can I cite this work?
 
-    You can cite this using
+    You can cite this using the CITATION.cff file above (and the "Cite this repository" drop-down on GitHub for BibTeX).
 
-    We hope to publish a whitepaper describing this work and its evaluation with students in more detail.
+    >Levonian, Z., Henkel, O., & Roberts, B. (2023). llm-math-education: Retrieval augmented generation for middle-school math question answering and hint generation (Version 0.5.1) [Computer software]. https://doi.org/10.5281/zenodo.8284412
+
+    We hope to publish a whitepaper describing this work and its evaluation with students in more detail; we'll update the CITATION.cff file if that happens.
+
+2. How should I use this code?
+
+   We aren't currently planning to add additional features to this package, although pull requests and bug reports are welcome.
+
+   You should use the Python package as a dependency if you want a quick way to try retrieval augmented generation with the OpenAI API.
+   However, this code is likely more useful as inspiration. You should fork or otherwise borrow from various components if you want some of the specific functionality implemented here. Heres a quick overview of the modules and their implementation:
+     - `llm_math_education.prompts.{mathqa,hints}` - Contains the prompt templates we use for math QA and hint generation.
+     - `llm_math_education.prompts` - TODO
