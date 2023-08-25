@@ -1,5 +1,8 @@
 def get_gpd_codes(lesson_code):
     """
+    The Global Proficiency Framework (GPF) uses GPD codes.
+    This is a slight variant of GPD codes that includes the grade before the GPD code.
+
     Structure is: G<grade>.<domain><construct>.<subconstruct>.<skill>.<index>
 
     e.g. G9.N5.1.3.1 has:

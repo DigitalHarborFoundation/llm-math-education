@@ -14,12 +14,19 @@ class RetrievalDb:
     """In-memory retrieval helper class.
 
     When creating new embeddings:
-        self.create_embeddings()
-        self.save_df()
+    ```python
+        assert "text_col" in df.columns
+        retrieval_db = RetrievalDb(Path("embedding_dir"), "db_name", "text_col", df)
+        retrieval_db.create_embeddings()
+        retrieval_db.save_df()
+    ```
 
     When loading existing embeddings:
-        self.load()
-
+    ```python
+        retrieval_db = RetrievalDb(Path("embedding_dir"), "db_name", "text_col")
+        # `load()` is called during construction if df is not provided
+        assert "text_col" in retrieval_db.df.columns
+    ```
     """
 
     def __init__(
@@ -145,7 +152,15 @@ class DbInfo:
                 kwargs[expected_key] = getattr(self, expected_key)
         return DbInfo(self.db, **kwargs)
 
-    def get_fill_string_from_distances(self, distances: np.array):
+    def get_fill_string_from_distances(self, distances: np.array) -> str:
+        """Given distances to the texts within the RetrievalDb, create an appropriate fill string.
+
+        Args:
+            distances (np.array): Distances, where closer texts in the RetrievalDb are more relevant.
+
+        Returns:
+            str: The string to include in the prompt.
+        """
         sort_inds = get_distance_sort_indices(distances)
         used_inds = set()
         texts = []
@@ -170,6 +185,11 @@ class DbInfo:
         return fill_string
 
     def get_single_text(self, ind: int):
+        """Given a index, return the text and corresponding number of tokens from the RetrievalDb.
+
+        Args:
+            ind (int): _description_
+        """
         row = self.db.df.iloc[ind]
         text = row[self.db.embed_col]
         n_tokens = row[self.db.n_tokens_col]

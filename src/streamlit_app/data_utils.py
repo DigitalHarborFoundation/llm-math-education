@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from llm_math_education import retrieval, retrieval_strategies
+from llm_math_education import misconceptions, retrieval, retrieval_strategies
 
 DATA_DIR = Path("./data") / "app_data"
 RETRIEVAL_OPTIONS_LIST = [
@@ -53,6 +53,7 @@ def create_hint_default_retrieval_slot_map() -> dict[str, retrieval.DbInfo]:
     slot_map = {
         "rori_microlesson_texts": rori_microlesson_db_info,
         "openstax_subsection_texts": openstax_subsection_db_info,
+        "misconception_string": misconceptions.get_misconceptions_string(),
     }
     return slot_map
 
@@ -165,7 +166,11 @@ def load_hint_problem_data() -> pd.DataFrame:
     - Incorrect answer
     - Lesson
     """
-    question_df = pd.read_csv(DATA_DIR / "question_sample.csv").sort_values(by=["grade", "topic"])
+    return load_hint_problem_data_from_dir(DATA_DIR)
+
+
+def load_hint_problem_data_from_dir(data_dir: Path):
+    question_df = pd.read_csv(data_dir / "question_sample.csv").sort_values(by=["grade", "topic"])
     # .sort_values(by="question", key=lambda s: s.map(len))
     assert len(question_df) > 1
     question_df["display_name"] = [create_display_name(row) for row in question_df.itertuples()]

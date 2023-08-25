@@ -1,3 +1,5 @@
+import openai
+import openai.error
 import streamlit as st
 
 
@@ -50,7 +52,39 @@ def password_submitted():
         st.error("😕 Password incorrect")
 
 
-def check_is_authorized() -> bool:
+def openai_api_key_submitted():
+    entered_openai_api_key = st.session_state.openai_api_key_text_input
+    if validate_openai_api_key(entered_openai_api_key):
+        st.session_state.is_authorized = True
+        openai.api_key = entered_openai_api_key
+        st.session_state.is_openai_key_set = True
+    else:
+        st.error("😕 Couldn't validate OpenAI API key")
+
+
+def validate_openai_api_key(openai_api_key: str) -> bool:
+    previous_api_key = openai.api_key
+    try:
+        # temporarily override api key used
+        openai.api_key = openai_api_key
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo-0613",
+            messages=[{"role": "user", "content": "Hi"}],
+            request_timeout=10,
+            max_tokens=1,
+        )
+        completion["choices"][0]["message"]
+        return True
+    except openai.error.RateLimitError as ex:
+        st.warning(f"Valid API key, but got a RateLimitError: {ex}")
+    except Exception as ex:
+        st.warning(f"API returned an error: {ex}")
+    finally:
+        openai.api_key = previous_api_key
+    return False
+
+
+def check_is_authorized(allow_openai_key: bool = False) -> bool:
     if "is_authorized" not in st.session_state or not st.session_state.is_authorized:
         st.session_state.is_authorized = False
         if "is_authorized_via_token" not in st.session_state:
@@ -69,4 +103,14 @@ def check_is_authorized() -> bool:
                 on_change=password_submitted,
                 key="password_text_input",
             )
+            if allow_openai_key:
+                st.markdown(
+                    'Or, provide your own OpenAI API key. (See: ["Where do I find my Secret API Key?"](https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key))',
+                )
+                st.text_input(
+                    "OpenAI API key:",
+                    type="password",
+                    on_change=openai_api_key_submitted,
+                    key="openai_api_key_text_input",
+                )
     return st.session_state.is_authorized

@@ -2,18 +2,22 @@ from llm_math_education import retrieval
 
 
 class RetrievalStrategy:
-    """General retrieval strategy implementation, mostly just an interface."""
+    """General retrieval strategy interface."""
 
     def do_retrieval(self, expected_slots: list[str], user_query: str, previous_messages: list[dict[str, str]] = []):
         raise ValueError("Not implemented.")
 
 
 class NoRetrievalStrategy(RetrievalStrategy):
+    """Fill all expected_slots with the empty string."""
+
     def do_retrieval(self, expected_slots: list[str], user_query: str, previous_messages: list[dict[str, str]] = []):
         return {expected_slot: "" for expected_slot in expected_slots}
 
 
 class StaticRetrievalStrategy(RetrievalStrategy):
+    """Fill all expected_slots with a static string."""
+
     def __init__(self, fill_string: str) -> None:
         super().__init__()
         self.fill_string = fill_string
@@ -23,6 +27,9 @@ class StaticRetrievalStrategy(RetrievalStrategy):
 
 
 class EmbeddingRetrievalStrategy(RetrievalStrategy):
+    """Fill all expected_slots with up to max_token texts from the retrieval_db.
+    Uses the user_query to produce an embedding and compute RetrievalDb distances."""
+
     def __init__(self, db: retrieval.RetrievalDb, max_tokens: int = 2000) -> None:
         super().__init__()
         self.db: retrieval.RetrievalDb = db
@@ -46,6 +53,10 @@ class EmbeddingRetrievalStrategy(RetrievalStrategy):
 
 
 class MappedEmbeddingRetrievalStrategy(RetrievalStrategy):
+    """Fill all expected_slots based on the entries in slot_map.
+    If asked to fill a slot not in slot_map, will use nonmatching_fill instead.
+    slot_map can have either static strings or `retrieval.DbInfo`."""
+
     def __init__(self, slot_map: dict[str, str | retrieval.DbInfo], nonmatching_fill: str = "") -> None:
         super().__init__()
         self.slot_map = slot_map

@@ -6,6 +6,8 @@ from pathlib import Path
 
 
 class ChatLog:
+    """Not currently used, but a utility library to save conversation texts to a local file."""
+
     def __init__(self, log_dir: Path, filename: str = ""):
         if filename == "":
             # use today's date

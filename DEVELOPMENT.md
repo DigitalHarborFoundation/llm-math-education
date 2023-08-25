@@ -11,7 +11,7 @@ This repository uses Conda to manage two dependencies: Python and Poetry. ([This
 Install conda or miniconda. Then, create the needed environment, called `llm-math-education`.
 
 ```bash
-conda env create -f environment.yml
+conda env create -f conda-environment.yml
 ```
 
 ### Python development
@@ -110,3 +110,7 @@ OpenStax is a Rice University project to make high-quality math textbooks availa
 ### Math Nation
 
 [Math Nation](https://www.mathnation.com/about/history-mission/) is an interactive math tool for middle and high school math. Student questions asked in pre-algebra and algebra forums are a high-validity example of general QA questions asked by middle-school math students.
+
+### Misconception data
+
+Math misconception data assembled by Nancy Otero. See [this GitHub repository](https://github.com/creature-ai/math-misconceptions).

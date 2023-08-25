@@ -9,7 +9,7 @@ QUESTION_SELECTBOX_DEFAULT_STRING = "(Choose a question from a Rori micro-lesson
 HINT_TYPE_BUTTON_LABELS_MAP = {
     "hint_sequence": "Get a hint sequence",
     "slip_correction": "Correct a slip",
-    # "misconception": "Describe a misconception",
+    "misconception": "Describe a misconception",
     "comparative_hint": "Compare this problem to a worked example",
 }
 
@@ -225,6 +225,6 @@ st.set_page_config(
     page_icon="💡",
 )
 
-if auth_utils.check_is_authorized():
+if auth_utils.check_is_authorized(allow_openai_key=True):
     instantiate_session()
     build_app()
