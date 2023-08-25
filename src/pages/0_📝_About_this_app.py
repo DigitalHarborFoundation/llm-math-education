@@ -14,7 +14,7 @@ The core technical approach is to use ["retrieval augmented generation"](https:/
 
 #### People
 
-This app was created by Zachary Levonian (LEVI Engineering Hub) and Owen Henkel (Rori/Rising Academies).
+This app was created by Zachary Levonian ([Digital Harbor Foundation](https://digitalharbor.org/)) and Owen Henkel ([Rori](https://rori.ai/)/[Rising Academies](https://www.risingacademies.com/about)).
 
 Contact Zach (<levon003@umn.edu>) with any questions.
 
@@ -23,9 +23,10 @@ Contact Zach (<levon003@umn.edu>) with any questions.
 This app's code is hosted [on GitHub](https://github.com/levon003/llm-math-education).
 Feel free to open an [issue](https://github.com/levon003/llm-math-education/issues) with questions, comments, or requests.
 
-This app currently uses data from three sources:
+This app currently uses data from a few sources:
  - Sample student queries are from [MathNation](https://www.mathnation.com/).
  - Prealgebra textbook is from [OpenStax](https://openstax.org/details/books/prealgebra-2e).
- - Rori micro-lessons were provided by [Rising Academies](https://www.risingacademies.com/).
+ - Rori micro-lessons and some common incorrect answers were provided by [Rising Academies](https://www.risingacademies.com/).
+ - Common math misconceptions were assembled by [Nancy Otero](https://github.com/creature-ai/math-misconceptions).
 """,
 )

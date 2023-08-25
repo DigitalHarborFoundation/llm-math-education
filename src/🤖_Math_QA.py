@@ -186,7 +186,7 @@ def build_app():
 
 Ask math questions, receive curriculum-based answers.
 
-This demo explores the feasibility of providing a math-related dialogues to answer middle-school student questions.
+This demo explores the feasibility of using math-related dialogues to answer middle-school students' questions.
 
 Start with a question, and then ask follow-up questions.""",
     )

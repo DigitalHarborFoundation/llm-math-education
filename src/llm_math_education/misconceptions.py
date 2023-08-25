@@ -26,6 +26,11 @@ def load_misconception_list() -> list[dict[str, str]]:
 
 @functools.cache
 def get_misconceptions_string() -> str:
+    """Intended for use in prompts, this is a semi-colon delimited list of common math misconceptions.
+
+    Returns:
+        str: List of misconceptions that is approximately 1000 tokens (see notebook).
+    """
     misconception_list = get_misconception_list()
     misconception_list.sort(key=itemgetter("Topic", "ID"))
     descriptions = []
