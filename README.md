@@ -166,8 +166,6 @@ pm.set_intro_messages(mathqa_prompts.intro_prompts["general_math_qa_intro"])
 
 See the [developer's guide](/DEVELOPMENT.md).
 
-### Contributors
-
 Primary contributor:
 
  - Zachary Levonian (<levon003@umn.edu>)
@@ -192,6 +190,13 @@ Other contributors:
    We aren't currently planning to add additional features to this package, although pull requests and bug reports are welcome.
 
    You should use the Python package as a dependency if you want a quick way to try retrieval augmented generation with the OpenAI API.
-   However, this code is likely more useful as inspiration. You should fork or otherwise borrow from various components if you want some of the specific functionality implemented here. Heres a quick overview of the modules and their implementation:
+   However, this code is likely more useful as inspiration. You should fork or otherwise borrow from various components if you want some of the specific functionality implemented here. Heres a quick overview of the most important modules and their implementation:
      - `llm_math_education.prompts.{mathqa,hints}` - Contains the prompt templates we use for math QA and hint generation.
-     - `llm_math_education.prompts` - TODO
+     - `llm_math_education.prompt_utils` - `PromptManager` is an abstraction for iteratively creating conversations that include a retrieval component.
+     - `llm_math_education.retrieval_strategies` - `RetrievalStrategy` and its implementations demonstrates implementations that use embeddings to fill a slot within a prompt template with relevant documents.
+     - `llm_math_education.retrieval` - `RetrievalDb` creates an embedding-backed in-memory lookup database for a Pandas DataFrame with a text column.
+     - `llm_math_education.logit_bias` - Using the most frequent tokens in a retrieved document, creates a [logit_bias](https://help.openai.com/en/articles/5247780-using-logit-bias-to-define-token-probability) that can be used to increase the [faithfulness](https://arxiv.org/abs/2307.16877) of generations based on that retrieved document.
+
+3. What license does this repository use?
+
+   The code is released under the MIT license. The example data used in the Streamlit app is released CC BY-SA 4.0; see the `data/app_data` folder for more info. Additional details on the data are present in the developer's guide.
