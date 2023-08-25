@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from llm_math_education import retrieval, retrieval_strategies
+from llm_math_education import misconceptions, retrieval, retrieval_strategies
 
 DATA_DIR = Path("./data") / "app_data"
 RETRIEVAL_OPTIONS_LIST = [
@@ -53,6 +53,7 @@ def create_hint_default_retrieval_slot_map() -> dict[str, retrieval.DbInfo]:
     slot_map = {
         "rori_microlesson_texts": rori_microlesson_db_info,
         "openstax_subsection_texts": openstax_subsection_db_info,
+        "misconception_string": misconceptions.get_misconceptions_string(),
     }
     return slot_map
 

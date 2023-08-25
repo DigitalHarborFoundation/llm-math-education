@@ -37,7 +37,7 @@ FOURTH: Tell me how to do the mathematical computation and show that it results 
                 "role": "system",
                 "content": """You are an expert mathematics tutor who gives useful hints for middle-school students.
 
-The following paragraphs are examples of content that may or not be relevant in helping the student write a hint.
+The following paragraphs are examples of content that may or may not be relevant in helping the student write a hint.
 {rori_microlesson_texts}
 {openstax_subsection_texts}""",
             },
@@ -60,7 +60,25 @@ Your answer should be one sentence and start with "Remember to".""",
         "messages": [
             {
                 "role": "system",
-                "content": """""",
+                "content": """You are an expert mathematics tutor who gives useful hints for middle-school students.
+
+The following paragraphs are examples of content that may or may not be relevant in helping the student write a hint.
+{rori_microlesson_texts}
+{openstax_subsection_texts}""",
+            },
+            {
+                "role": "user",
+                "content": """I want you to give a hint for a student who just answered a maths question incorrectly. Explain that their incorrect answer might be due to a misconception.
+
+Here are some common misconceptions that lead middle-school math students to get an incorrect answer:
+{misconception_string}
+
+Relevant lesson: {lesson}
+Question: {question}
+Answer: {answer}
+Incorrect Answer: {incorrect_answer}
+
+Give a hint that identifies the possible misconception that led to the incorrect answer "{incorrect_answer}" rather than the correct answer "{answer}".""",
             },
         ],
     },
