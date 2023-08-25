@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Levonian
+    given-names: Zachary
+    orcid: https://orcid.org/1234-5678-9101-1121
+  - family-names: Henkel
+    given-names: Owen
+  - family-names: Roberts
+    given-names: Bill
+title: "llm-math-education: Retrieval augmented generation for middle-school math question answering and hint generation"
+abstract: "How can we incorporate trusted, external math knowledge in generated answers to student questions? llm-math-education is a Python package that implements basic retrieval augmented generation (RAG) and contains prompts for two primary use cases: general math question-answering (QA) and hint generation."
+version: 0.5.1
+doi: 10.5281/zenodo.8284412
+date-released: 2023-08-25
+license: MIT
+repository-code: "https://github.com/levon003/llm-math-education"
