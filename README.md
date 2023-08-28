@@ -10,6 +10,9 @@ How can we incorporate trusted, external math knowledge in generated answers to 
 This project is [hosted on GitHub](https://github.com/levon003/llm-math-education).
 Feel free to open an [issue](https://github.com/levon003/llm-math-education/issues) with questions, comments, or requests.
 
+## Demo
+
+You can explore the effects of the retrieval-augmented generation approach by using our [Streamlit app](https://llm-math-education-levon003.streamlit.app/About_this_app). You'll need to provide your own OpenAI API key.
 
 ## Installation
 

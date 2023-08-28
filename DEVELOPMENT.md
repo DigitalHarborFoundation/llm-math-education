@@ -74,6 +74,10 @@ I did not include the FAISS dependency in `environment.yaml`.
 
 A few notes about the app.
 
+#### Deployment
+
+Manually deployed via `levon003`'s account.
+
 #### Authentication
 
 For local development, streamlit secrets need to be stored in `.streamlit/secrets.toml`
