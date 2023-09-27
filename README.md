@@ -1,14 +1,14 @@
 # llm-math-education: Retrieval augmented generation for middle-school math question answering and hint generation
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8284412.svg)](https://doi.org/10.5281/zenodo.8284412)
-[![License](https://img.shields.io/github/license/levon003/llm-math-education)](https://github.com/levon003/llm-math-education/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DigitalHarborFoundation/llm-math-education)](https://github.com/DigitalHarborFoundation/llm-math-education/blob/main/LICENSE)
 
 How can we incorporate trusted, external math knowledge in generated answers to student questions?
 
 `llm-math-education` is a Python package that implements basic retrieval augmented generation (RAG) and contains prompts for two primary use cases: general math question-answering (QA) and hint generation. It is currently designed to work only with the OpenAI generative chat API.
 
-This project is [hosted on GitHub](https://github.com/levon003/llm-math-education).
-Feel free to open an [issue](https://github.com/levon003/llm-math-education/issues) with questions, comments, or requests.
+This project is [hosted on GitHub](https://github.com/DigitalHarborFoundation/llm-math-education).
+Feel free to open an [issue](https://github.com/DigitalHarborFoundation/llm-math-education/issues) with questions, comments, or requests.
 
 ## Demo
 
