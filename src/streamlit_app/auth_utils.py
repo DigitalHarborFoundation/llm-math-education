@@ -84,7 +84,7 @@ def validate_openai_api_key(openai_api_key: str) -> bool:
     return False
 
 
-def check_is_authorized(allow_openai_key: bool = False) -> bool:
+def check_is_authorized(allow_openai_key: bool = False, markdown_header: str = "") -> bool:
     if "is_authorized" not in st.session_state or not st.session_state.is_authorized:
         st.session_state.is_authorized = False
         if "is_authorized_via_token" not in st.session_state:
@@ -97,6 +97,8 @@ def check_is_authorized(allow_openai_key: bool = False) -> bool:
             if st.session_state.is_authorized_via_token:
                 st.session_state.is_authorized = True
         if not st.session_state.is_authorized:
+            if markdown_header != "":
+                st.markdown(markdown_header)
             st.text_input(
                 "Password:",
                 type="password",

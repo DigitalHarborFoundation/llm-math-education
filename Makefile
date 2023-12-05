@@ -1,4 +1,4 @@
-.PHONY: help install ensure-poetry install-precommits install-kernel test run-streamlit build-docker run-docker
+.PHONY: help install ensure-poetry install-precommits install-kernel test run-streamlit run-hint-generation-streamlit build-docker run-docker
 
 help:
 	@echo "Relevant targets are 'install' and 'test'."
@@ -49,3 +49,6 @@ remove-docker:
 
 run-streamlit:
 	@streamlit run src/🤖_Math_QA.py --
+
+run-hint-generation-streamlit:
+	@streamlit run src/hint_generation/app.py --

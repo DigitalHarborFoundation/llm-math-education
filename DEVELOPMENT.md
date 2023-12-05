@@ -76,7 +76,7 @@ A few notes about the app.
 
 #### Deployment
 
-Manually deployed via `levon003`'s account.
+Manually deployed via `levon003`'s Streamlit account.
 
 #### Authentication
 
@@ -90,14 +90,39 @@ AUTH_TOKEN = "argon2:$argon2id$v=19$m=10240,t=10,p=8$MuVIOw20jkOi1nKR90hPhA$H22n
 
 To generate the auth_token:
 ```
->>> import notebook.auth.security
->>> notebook.auth.security.passwd()
-Enter password: abc
-Verify password: abc
-'argon2:$argon2id$v=19$m=10240,t=10,p=8$MuVIOw20jkOi1nKR90hPhA$H22nY8aNyfztLYQCSj5NRw5/Cy2WOo6kl3K61RyaoZY'
+>>> from streamlit_app import auth_utils
+>>> import getpass
+>>> auth_utils.passwd_hash(getpass.getpass())
+Password: abc
+'argon2:$argon2id$v=19$m=10240,t=10,p=8$VfrxYg66b419O8hFi+vCLA$HZXq1dU0+KMUbOBxJjLaweXoHguJH+2AkPL1EurOOys'
 ```
 
 If the AUTH_TOKEN is provided in the secrets, can authenticate automatically via URL parameter, e.g. `{base_url}?auth_token=abc`.
+
+Generate your own secure auth token.
+
+First:
+
+```
+>>> from streamlit_app import auth_utils
+>>> auth_token = auth_utils.generate_auth_token()
+>>> auth_token
+'21bbeab31ed2a3ebcd5563df65db64ba'
+>>> auth_utils.passwd_hash(auth_token)
+'argon2:$argon2id$v=19$m=10240,t=10,p=8$ECyPoKgu51axdr4rgktOCA$qmrYxYoSaVq4uCwm9W5csfltApcKBQRTHLdtQY9OVKI'
+```
+
+Second, put the generated token in `secrets.toml`:
+
+```
+AUTH_TOKEN="argon2:$argon2id$v=19$m=10240,t=10,p=8$ECyPoKgu51axdr4rgktOCA$qmrYxYoSaVq4uCwm9W5csfltApcKBQRTHLdtQY9OVKI"
+```
+
+Third, you can then authenticate with `{base_url}?auth_token=21bbeab31ed2a3ebcd5563df65db64ba`
+
+#### Hint generation app
+
+The standalone hint-generation app is hosted at `src/hint_generation/app.py`.
 
 ## Data
 
