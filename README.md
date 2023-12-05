@@ -187,11 +187,11 @@ Other contributors:
 
 1. How can I cite this work?
 
-    You can cite this using the CITATION.cff file above (and the "Cite this repository" drop-down on GitHub for BibTeX).
+    You should cite [our paper](https://arxiv.org/abs/2310.03184) at the NeurIPS’23 Workshop on Generative AI for Education (GAIED).
 
-    >Levonian, Z., Henkel, O., & Roberts, B. (2023). llm-math-education: Retrieval augmented generation for middle-school math question answering and hint generation (Version 0.5.1) [Computer software]. https://doi.org/10.5281/zenodo.8284412
+    You can cite this using the CITATION.cff file above (and the "Cite this repository" drop-down on GitHub for BibTeX) or the following citation:
 
-    We hope to publish a whitepaper describing this work and its evaluation with students in more detail; we'll update the CITATION.cff file if that happens.
+    >Zachary Levonian, Chenglu Li, Wangda Zhu, Anoushka Gade, Owen Henkel, Millie-Ellen Postle, and Wanli Xing. 2023. [Retrieval-augmented Generation to Improve Math Question-Answering: Trade-offs Between Groundedness and Human Preference](https://arxiv.org/abs/2310.03184). In _NeurIPS’23 Workshop on Generative AI for Education (GAIED)_, New Orleans, USA. DOI:https://doi.org/10.48550/arXiv.2310.03184
 
 2. How should I use this code?
 
