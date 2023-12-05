@@ -140,19 +140,31 @@ def instantiate_session():
 
 
 def build_app():
+    with st.sidebar:
+        st.markdown(
+            """
+### About this demo
+
+This demo was produced with the [Learning Engineering Virtual Institute](https://learning-engineering-virtual-institute.org/) (LEVI)
+        in collaboration with [Digital Harbor Foundation](https://digitalharbor.org/),
+        [Rising Academies](https://www.risingacademies.com/),
+        and [The Learning Agency](https://the-learning-agency.com/).
+The primary contributors are [Zachary Levonian](https://levon003.github.io/) and [Owen Henkel](https://www.linkedin.com/in/owenhenkel/).
+
+This demo was made in [Streamlit](https://streamlit.io/). The code and data for this demo are available [on GitHub](https://github.com/DigitalHarborFoundation/llm-math-education).
+        """,
+        )
     st.markdown(
-        """# Hint generation
+        """# Creating math hints with ChatGPT
 
 Generate hints for practice problems given an incorrect answer.
 Choose a practice problem from the bank below or insert your own lesson, worked example, and practice problem in the fields below.""",
     )
     question_df = data_utils.load_hint_problem_data()
-    with st.expander("Lesson and worked example"):
-        st.text_area(
-            "Lesson and worked example text:",
-            key="lesson_text_area",
-            label_visibility="collapsed",
-        )
+    st.text_area(
+        "Lesson and worked example:",
+        key="lesson_text_area",
+    )
     st.selectbox(
         "Choose a practice problem:",
         [QUESTION_SELECTBOX_DEFAULT_STRING] + question_df.display_name.to_list(),
