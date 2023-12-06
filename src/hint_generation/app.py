@@ -238,6 +238,9 @@ st.set_page_config(
     page_icon="💡",
 )
 
+st.markdown("# Creating math hints with ChatGPT")
 if auth_utils.check_is_authorized(allow_openai_key=False):
     instantiate_session()
     build_app()
+else:
+    st.markdown("Thanks for your interest in ")

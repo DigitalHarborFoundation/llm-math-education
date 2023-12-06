@@ -2,6 +2,8 @@ import openai
 import openai.error
 import streamlit as st
 
+PASSWORD_TEXT_INPUT_KEY = "password_text_input"
+
 
 def generate_auth_token() -> str:
     import binascii
@@ -103,7 +105,7 @@ def check_is_authorized(allow_openai_key: bool = False, markdown_header: str = "
                 "Password:",
                 type="password",
                 on_change=password_submitted,
-                key="password_text_input",
+                key=PASSWORD_TEXT_INPUT_KEY,
             )
             if allow_openai_key:
                 st.markdown(
