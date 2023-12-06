@@ -139,7 +139,7 @@ def instantiate_session():
         st.session_state.is_openai_key_set = True
 
 
-def build_app():
+def make_sidebar():
     with st.sidebar:
         st.markdown(
             """
@@ -152,12 +152,26 @@ This demo was produced with the [Learning Engineering Virtual Institute](https:/
 The primary contributors are [Zachary Levonian](https://levon003.github.io/) and [Owen Henkel](https://www.linkedin.com/in/owenhenkel/).
 
 This demo was made in [Streamlit](https://streamlit.io/). The code and data for this demo are available [on GitHub](https://github.com/DigitalHarborFoundation/llm-math-education).
+
+### How does this demo work?
+
+This demo uses [ChatGPT](https://openai.com/chatgpt) to generate hints based on the text you provide in the form.
+Specifically, we use the GPT-3.5 model alongside a technical technique called ["retrieval augmented generation"](https://www.promptingguide.ai/techniques/rag) to provide hints that are (hopefully!) appropriate for middle-school math students.
+
+As this is just a demo and it relies on ChatGPT, it will make mistakes! We wouldn't recommend you use this to actually write course content, although if it's helpful to you please let us know.
+
+This demo relies on access to a variety of open-access data sources:
+we use sample micro-lessons, problems, and common incorrect answers provided by [Rising Academies](https://www.risingacademies.com/),
+a pre-algebra textbook available for free from [OpenStax](https://openstax.org/details/books/prealgebra-2e), and a list of common math misconceptions assembled by [Nancy Otero](https://github.com/creature-ai/math-misconceptions).
+
+Have more questions or comments? Please contact Zach (<zach@digitalharbor.org>) with your thoughts!
         """,
         )
-    st.markdown(
-        """# Creating math hints with ChatGPT
 
-Generate hints for practice problems given an incorrect answer.
+
+def build_app():
+    st.markdown(
+        """Generate hints for practice problems given an incorrect answer.
 Choose a practice problem from the bank below or insert your own lesson, worked example, and practice problem in the fields below.""",
     )
     question_df = data_utils.load_hint_problem_data()
@@ -239,8 +253,11 @@ st.set_page_config(
 )
 
 st.markdown("# Creating math hints with ChatGPT")
+make_sidebar()
 if auth_utils.check_is_authorized(allow_openai_key=False):
     instantiate_session()
     build_app()
 else:
-    st.markdown("Thanks for your interest in ")
+    st.markdown(
+        "Thanks for your interest in our demo! The password should have been shared with you alongside the demo link.\n\nPlease contact Zach (<zach@digitalharbor.org>) with any questions about getting access.",
+    )
