@@ -76,7 +76,7 @@ A few notes about the app.
 
 #### Deployment
 
-Manually deployed via `levon003`'s Streamlit account.
+Manually deployed via `levon003`'s (GitHub-linked) [Streamlit account](https://share.streamlit.io/).
 
 #### Authentication
 
@@ -123,6 +123,8 @@ Third, you can then authenticate with `{base_url}?auth_token=21bbeab31ed2a3ebcd5
 #### Hint generation app
 
 The standalone hint-generation app is hosted at `src/hint_generation/app.py`.
+
+The password-protected demo for the hint generation component is deployed at this URL: <https://levi-math-hints.streamlit.app>
 
 ## Data
 
