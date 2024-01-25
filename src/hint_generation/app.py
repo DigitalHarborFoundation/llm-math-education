@@ -5,6 +5,7 @@ from llm_math_education import prompt_utils, retrieval_strategies
 from llm_math_education.prompts import hints as hint_prompts
 from streamlit_app import auth_utils, chat_utils, data_utils
 
+REQUIRE_AUTHENTICATION = False
 QUESTION_SELECTBOX_DEFAULT_STRING = "(Choose a question from a Rori micro-lesson)"
 HINT_TYPE_BUTTON_LABELS_MAP = {
     "hint_sequence": "Get a hint sequence",
@@ -254,7 +255,7 @@ st.set_page_config(
 
 st.markdown("# Creating math hints with ChatGPT")
 make_sidebar()
-if auth_utils.check_is_authorized(allow_openai_key=False):
+if REQUIRE_AUTHENTICATION and auth_utils.check_is_authorized(allow_openai_key=False):
     instantiate_session()
     build_app()
 else:
