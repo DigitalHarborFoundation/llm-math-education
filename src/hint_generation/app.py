@@ -202,16 +202,16 @@ def build_app():
             "Correct answer:",
             key="correct_answer_text_input",
         )
+    correct_answer = st.session_state.correct_answer_text_input.strip()
+    incorrect_answer = st.session_state.incorrect_answer_text_input.strip()
     are_buttons_enabled = (
-        st.session_state.correct_answer_text_input.strip() != ""
-        and st.session_state.incorrect_answer_text_input.strip() != ""
-        and st.session_state.question_text_area.strip() != ""
+        correct_answer != "" and incorrect_answer != "" and st.session_state.question_text_area.strip() != ""
     )
     # if not are_buttons_enabled:
     #    st.warning(
     #        f"Select a practice problem above, then choose one of {len(HINT_TYPE_BUTTON_LABELS_MAP)} hint types.",
     #    )
-    if st.session_state.correct_answer_text_input.strip() == st.session_state.incorrect_answer_text_input.strip():
+    if len(correct_answer) > 0 and correct_answer == incorrect_answer:
         st.warning("To generate a hint, the student's answer can't match the correct answer.")
         are_buttons_enabled = False
     # add the hint buttons
