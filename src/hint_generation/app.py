@@ -5,13 +5,14 @@ from llm_math_education import prompt_utils, retrieval_strategies
 from llm_math_education.prompts import hints as hint_prompts
 from streamlit_app import auth_utils, chat_utils, data_utils
 
+SHOW_QUESTION_BANK = False
 REQUIRE_AUTHENTICATION = False
 QUESTION_SELECTBOX_DEFAULT_STRING = "(Choose a question from a Rori micro-lesson)"
 HINT_TYPE_BUTTON_LABELS_MAP = {
     "hint_sequence": "Get a hint sequence",
-    "slip_correction": "Correct a slip",
-    "misconception": "Describe a misconception",
-    "comparative_hint": "Compare this problem to a worked example",
+    #    "slip_correction": "Correct a slip",
+    #    "misconception": "Describe a misconception",
+    #    "comparative_hint": "Compare this problem to a worked example",
 }
 
 
@@ -172,22 +173,22 @@ Have more questions or comments? Please contact Zach (<zach@digitalharbor.org>) 
 
 def build_app():
     st.markdown(
-        """Generate hints for practice problems given an incorrect answer.
-Choose a practice problem from the bank below or insert your own lesson, worked example, and practice problem in the fields below.""",
+        """Generate hints for practice problems, given an incorrect answer.""",
     )
     question_df = data_utils.load_hint_problem_data()
     st.text_area(
-        "Lesson and worked example:",
+        "Write a brief teaching objective in the box below.",
         key="lesson_text_area",
     )
-    st.selectbox(
-        "Choose a practice problem:",
-        [QUESTION_SELECTBOX_DEFAULT_STRING] + question_df.display_name.to_list(),
-        key="question_selectbox",
-        on_change=question_selectbox_changed,
-    )
+    if SHOW_QUESTION_BANK:
+        st.selectbox(
+            "Choose a practice problem:",
+            [QUESTION_SELECTBOX_DEFAULT_STRING] + question_df.display_name.to_list(),
+            key="question_selectbox",
+            on_change=question_selectbox_changed,
+        )
     st.text_area(
-        "Practice problem:",
+        "Insert practice problem in box below.",
         key="question_text_area",
     )
     c1, c2 = st.columns(2)
@@ -206,11 +207,11 @@ Choose a practice problem from the bank below or insert your own lesson, worked 
         and st.session_state.incorrect_answer_text_input.strip() != ""
         and st.session_state.question_text_area.strip() != ""
     )
-    if not are_buttons_enabled:
-        st.warning(
-            f"Select a practice problem above, then choose one of {len(HINT_TYPE_BUTTON_LABELS_MAP)} hint types.",
-        )
-    elif st.session_state.correct_answer_text_input.strip() == st.session_state.incorrect_answer_text_input.strip():
+    # if not are_buttons_enabled:
+    #    st.warning(
+    #        f"Select a practice problem above, then choose one of {len(HINT_TYPE_BUTTON_LABELS_MAP)} hint types.",
+    #    )
+    if st.session_state.correct_answer_text_input.strip() == st.session_state.incorrect_answer_text_input.strip():
         st.warning("To generate a hint, the student's answer can't match the correct answer.")
         are_buttons_enabled = False
     # add the hint buttons
