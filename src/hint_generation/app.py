@@ -256,7 +256,7 @@ st.set_page_config(
 
 st.markdown("# Creating math hints with ChatGPT")
 make_sidebar()
-if REQUIRE_AUTHENTICATION and auth_utils.check_is_authorized(allow_openai_key=False):
+if not REQUIRE_AUTHENTICATION or auth_utils.check_is_authorized(allow_openai_key=False):
     instantiate_session()
     build_app()
 else:
