@@ -16,7 +16,7 @@ A [fork of this repository at `DigitalHarborFoundation/rag-for-math-qa`](https:/
 
 You can explore the effects of the retrieval-augmented generation approach by using our [Streamlit app](https://llm-math-education-levon003.streamlit.app/About_this_app). You'll need to provide your own OpenAI API key.
 
-Demo link: <https://llm-math-education-levon003.streamlit.app>
+Demo link: <https://llm-math-education.streamlit.app>
 
 ## Installation
 
