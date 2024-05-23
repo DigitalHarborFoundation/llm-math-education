@@ -1,5 +1,6 @@
 # llm-math-education: Retrieval augmented generation for middle-school math question answering and hint generation
 
+[![arXiv](https://img.shields.io/badge/arXiv-2310.03184-b31b1b.svg)](https://arxiv.org/abs/2310.03184)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8284412.svg)](https://doi.org/10.5281/zenodo.8284412)
 [![License](https://img.shields.io/github/license/DigitalHarborFoundation/llm-math-education)](https://github.com/DigitalHarborFoundation/llm-math-education/blob/main/LICENSE)
 
