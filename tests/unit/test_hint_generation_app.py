@@ -14,9 +14,10 @@ def test_hint_generation_app():
     at.secrets["OPENAI_API_KEY"] = "test-key"
     at.run()
     assert not at.exception
-    assert not at.session_state.is_authorized
+    assert "is_authorized" not in at.session_state or not at.session_state.is_authorized
 
     # attempt to log in
-    at.text_input(key=auth_utils.PASSWORD_TEXT_INPUT_KEY).input(password).run()
-    assert not at.exception
-    assert at.session_state.is_authorized
+    # note: this is deprecated, because we turend off passwords for this demo
+    # at.text_input(key=auth_utils.PASSWORD_TEXT_INPUT_KEY).input(password).run()
+    # assert not at.exception
+    # assert at.session_state.is_authorized

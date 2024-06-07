@@ -136,9 +136,8 @@ def instantiate_session():
     if "prompt_manager" not in st.session_state:
         st.session_state.prompt_manager = prompt_utils.PromptManager()
 
-    query_params = st.experimental_get_query_params()
-    if "show_expert_controls" in query_params:
-        if query_params["show_expert_controls"][0].lower() == "true":
+    if "show_expert_controls" in st.query_params:
+        if st.query_params["show_expert_controls"].lower() == "true":
             st.session_state.show_expert_controls = True
 
     if "student_queries" not in st.session_state:

@@ -131,13 +131,15 @@ def instantiate_session():
         retrieval_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map)
         st.session_state.hint_prompt_manager.set_retrieval_strategy(retrieval_strategy)
 
-    query_params = st.experimental_get_query_params()
-    if "show_expert_controls" in query_params:
-        if query_params["show_expert_controls"][0].lower() == "true":
+    if "show_expert_controls" in st.query_params:
+        if st.query_params["show_expert_controls"][0].lower() == "true":
             st.session_state.show_expert_controls = True
 
     if "is_openai_key_set" not in st.session_state or not st.session_state.is_openai_key_set:
-        openai.api_key = st.secrets["OPENAI_API_KEY"]
+        if "openai_api_key" in st.query_params:
+            openai.api_key = st.query_params["openai_api_key"]
+        else:
+            openai.api_key = st.secrets["OPENAI_API_KEY"]
         st.session_state.is_openai_key_set = True
 
 
@@ -166,7 +168,7 @@ This demo relies on access to a variety of open-access data sources:
 we use sample micro-lessons, problems, and common incorrect answers provided by [Rising Academies](https://www.risingacademies.com/),
 a pre-algebra textbook available for free from [OpenStax](https://openstax.org/details/books/prealgebra-2e), and a list of common math misconceptions assembled by [Nancy Otero](https://github.com/creature-ai/math-misconceptions).
 
-Have more questions or comments? Please contact Zach (<zach@digitalharbor.org>) with your thoughts!
+Have more questions or comments? Please contact Zach (<zach@levi.digitalharbor.org>) with your thoughts!
         """,
         )
 

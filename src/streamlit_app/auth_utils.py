@@ -90,10 +90,9 @@ def check_is_authorized(allow_openai_key: bool = False, markdown_header: str = "
     if "is_authorized" not in st.session_state or not st.session_state.is_authorized:
         st.session_state.is_authorized = False
         if "is_authorized_via_token" not in st.session_state:
-            query_params = st.experimental_get_query_params()
             st.session_state.is_authorized_via_token = False
-            if "auth_token" in query_params and "AUTH_TOKEN" in st.secrets:
-                auth_token = query_params["auth_token"][0]
+            if "auth_token" in st.query_params and "AUTH_TOKEN" in st.secrets:
+                auth_token = st.query_params["auth_token"]
                 if passwd_check(st.secrets["AUTH_TOKEN"], auth_token):
                     st.session_state.is_authorized_via_token = True
             if st.session_state.is_authorized_via_token:
