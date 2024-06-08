@@ -129,9 +129,8 @@ def instantiate_session():
         retrieval_strategy = retrieval_strategies.MappedEmbeddingRetrievalStrategy(slot_map)
         st.session_state.hint_prompt_manager.set_retrieval_strategy(retrieval_strategy)
 
-    query_params = st.experimental_get_query_params()
-    if "show_expert_controls" in query_params:
-        if query_params["show_expert_controls"][0].lower() == "true":
+    if "show_expert_controls" in st.query_params:
+        if st.query_params["show_expert_controls"].lower() == "true":
             st.session_state.show_expert_controls = True
 
     if "is_openai_key_set" not in st.session_state or not st.session_state.is_openai_key_set:
