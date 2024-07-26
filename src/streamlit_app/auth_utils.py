@@ -70,7 +70,7 @@ def validate_openai_api_key(openai_api_key: str) -> bool:
         # temporarily override api key used
         openai.api_key = openai_api_key
         completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
+            model="gpt-3.5-turbo-0125",
             messages=[{"role": "user", "content": "Hi"}],
             request_timeout=10,
             max_tokens=1,

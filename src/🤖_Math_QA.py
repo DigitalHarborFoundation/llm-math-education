@@ -71,7 +71,7 @@ def process_user_query(user_query: str):
                         s += "#### " + key + ":\n\n" + value.replace("\n", "\n\n") + "\n\n\n"
                     st.markdown(s)
             completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0613",
+                model="gpt-3.5-turbo-0125",
                 messages=messages,
                 temperature=st.session_state.temperature,
                 request_timeout=20,

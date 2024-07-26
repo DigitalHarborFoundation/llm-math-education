@@ -9,11 +9,11 @@ install:
 	@$(MAKE) install-kernel
 
 ensure-poetry:
-	@if [ "$(shell which poetry)" = "" ]; then \
+	@if [ -z "$$(which poetry)" ]; then \
 		echo "Did you activate the outer conda environment? Run: conda activate llm-math-education"; \
 		exit 1; \
 	else \
-		echo "Found existing Poetry installation at $(shell which poetry)."; \
+		echo "Found existing Poetry installation at $$(which poetry)"; \
 	fi
 	@poetry install
 
