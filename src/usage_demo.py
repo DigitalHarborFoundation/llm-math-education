@@ -71,7 +71,7 @@ print(messages)
 import openai
 
 completion = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo-0125",
+    model="gpt-4o-mini",
     messages=messages,
 )
 assistant_message = completion["choices"][0]["message"]
