@@ -17,7 +17,7 @@ class PromptSelector:
         self.intro_prompt_dict = intro_prompt_dict
         self.pretty_name_to_id_map = {
             t[1]["pretty_name"] if "pretty_name" in t[1] else f"Prompt {i}": t[0]
-            for i, t in enumerate(self.intro_prompt_dict)
+            for i, t in enumerate(self.intro_prompt_dict.items())
         }
 
     def get_intro_prompt_pretty_names(self):
@@ -28,14 +28,12 @@ class PromptSelector:
         return pretty_name_list
 
     def get_intro_prompt_message_lists(self) -> list[dict[str, str]]:
-        message_lists = []
-        for prompt_info in self.intro_prompt_dict.values():
-            message_lists.append(prompt_info["messages"])
-        return message_lists
+        return [prompt_info["messages"] for prompt_info in self.intro_prompt_dict.values()]
 
     def get_default_intro_prompt(self) -> dict[str]:
         return self.intro_prompt_dict[next(iter(self.intro_prompt_dict.keys()))]
 
+    @staticmethod
     def convert_conversation_to_string(messages):
         conversation_string = ""
         for message in messages:
@@ -43,10 +41,9 @@ class PromptSelector:
             conversation_string += message["content"] + "\n"
         return conversation_string
 
+    @staticmethod
     def convert_string_to_conversation(conversation_string: str) -> list[dict[str, str]]:
         """Given a string representing a conversation, convert into the expected messages list format.
-
-        Follows a pretty basic convention, defined in this implementation.
 
         Args:
             conversation_string (str): String representing a conversation.
@@ -55,18 +52,14 @@ class PromptSelector:
             list[dict[str, str]]: List of messages, each with a "role" and "content".
         """
         messages = []
-        message = {
-            "content": "",
-        }
+        message = {"content": ""}
         for line in conversation_string.split("\n"):
             possible_role = line[:-1].lower()
             if possible_role in VALID_ROLES:
                 if "role" in message:
                     message["content"] = message["content"].strip()
                     messages.append(message)
-                    message = {
-                        "content": "",
-                    }
+                    message = {"content": ""}
                 message["role"] = possible_role
             else:
                 message["content"] += line + "\n"
@@ -127,12 +120,9 @@ class PromptManager:
         if previous_messages is None:
             previous_messages = self.stored_messages
         if len(previous_messages) == 0:
-            # this is a new query
             messages = [message.copy() for message in self.intro_messages]
             self.stored_messages.extend(messages)
         else:
-            # not a new query,
-            # so include the previous messages as context
             messages = [message.copy() for message in previous_messages]
         if user_query is not None:
             user_message = {
@@ -157,18 +147,17 @@ class PromptManager:
                 self.recent_slot_fill_dict.append(slot_fill_dict)
                 assert len(slot_fill_dict) == len(expected_slots), "Unexpected fill provided."
                 if "user_query" in slot_fill_dict and user_query is not None:
-                    # special case: fill user_query slots with the current user_query
                     slot_fill_dict["user_query"] = user_query
                     should_remove_user_query_message = True
                 try:
                     message["content"] = message["content"].format(**slot_fill_dict)
-                except KeyError:
-                    raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}.")
+                except KeyError as e:
+                    raise KeyError(f"Failed to fill {expected_slots} with {slot_fill_dict}. Missing key: {e}")
+                except ValueError as e:
+                    raise ValueError(f"Formatting error: {e}")
             else:
                 self.recent_slot_fill_dict.append({})
             if query_for_retrieval_context == "" and message["role"] == "user":
-                # use as retrieval context the most recent user message
-                # TODO rethink this, providing a more flexible way to specify the retrieval context
                 query_for_retrieval_context = message["content"]
         self.recent_slot_fill_dict = self.recent_slot_fill_dict[::-1]
         if should_remove_user_query_message:
@@ -182,10 +171,9 @@ class PromptManager:
         total_token_count = sum(token_counts)
         return total_token_count
 
+    @staticmethod
     def identify_slots(prompt_string: str) -> list[str]:
         """Uses a regex to identify missing slots in a prompt_string.
-
-        More advanced slot formatting is not supported.
 
         Args:
             prompt_string (str): The prompt itself, with format-style slots to fill e.g. "This is a prompt with a slot: {slot_to_fill}"
