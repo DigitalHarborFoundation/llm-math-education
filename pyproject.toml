@@ -12,7 +12,7 @@ repository = "https://github.com/levon003/llm-math-education.git"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-poetry = "1.4.0"
+poetry = "^2.0.1"
 python-dotenv = "^1.0.0"
 openai = "<1.0"
 streamlit = "^1.0.0"
