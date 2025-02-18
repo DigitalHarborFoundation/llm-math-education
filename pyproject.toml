@@ -48,7 +48,7 @@ supabase = "^1.0.4"
 optional = true
 
 [tool.poetry.group.anserini.dependencies]
-lightgbm = "^3.3.5"
+lightgbm = ">=3.3.5,<5.0.0"
 nmslib = "^2.1.1"
 pyserini = "^0.21.0"
 
