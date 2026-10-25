@@ -1,5 +1,4 @@
 import openai
-import openai.error
 import streamlit as st
 
 PASSWORD_TEXT_INPUT_KEY = "password_text_input"
@@ -69,15 +68,9 @@ def validate_openai_api_key(openai_api_key: str) -> bool:
     try:
         # temporarily override api key used
         openai.api_key = openai_api_key
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages=[{"role": "user", "content": "Hi"}],
-            request_timeout=10,
-            max_tokens=1,
-        )
-        completion["choices"][0]["message"]
+        openai.models.list(timeout=10)
         return True
-    except openai.error.RateLimitError as ex:
+    except openai.RateLimitError as ex:
         st.warning(f"Valid API key, but got a RateLimitError: {ex}")
     except Exception as ex:
         st.warning(f"API returned an error: {ex}")

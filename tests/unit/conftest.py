@@ -47,8 +47,6 @@ def retrieval_db(retrieval_db_path) -> retrieval.RetrievalDb:
 
 @pytest.fixture(autouse=True)
 def no_openai(monkeypatch):
-    """Remove Embedding and ChatCompletion creations during all tests.
-
-    This is probably not necessary given the dotenv configuration."""
-    monkeypatch.delattr("openai.Embedding.create")
-    monkeypatch.delattr("openai.ChatCompletion.create")
+    """Remove Embedding and ChatCompletion creations during all tests."""
+    monkeypatch.delattr("openai.resources.Embeddings.create")
+    monkeypatch.delattr("openai.resources.chat.Completions.create")

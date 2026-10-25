@@ -1,19 +1,16 @@
-FROM python:3.10
-
-RUN python -m pip install --upgrade pip
-RUN curl -sSL https://install.python-poetry.org | python -
+FROM python:3.14-slim
+COPY --from=ghcr.io/astral-sh/uv:0.13.1 /uv /uvx /bin/
 
 WORKDIR /usr/app
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+
+# install dependencies first, for better layer caching
+COPY pyproject.toml uv.lock README.md LICENSE ./
+RUN uv sync --locked --no-dev --no-install-project
 
 COPY ./src ./src
-COPY ./tests ./tests
 COPY ./data/app_data ./data/app_data
-
-# note: README.md is required for Poetry
-COPY README.md README.md
-COPY pyproject.toml pyproject.toml
-COPY poetry.lock poetry.lock
-RUN pip install .
+RUN uv sync --locked --no-dev
 
 EXPOSE 8502
-ENTRYPOINT ["streamlit", "run", "src/🤖_Math_QA.py", "--server.port=8502", "--server.address=0.0.0.0"]
+ENTRYPOINT ["uv", "run", "--no-sync", "streamlit", "run", "src/🤖_Math_QA.py", "--server.port=8502", "--server.address=0.0.0.0"]

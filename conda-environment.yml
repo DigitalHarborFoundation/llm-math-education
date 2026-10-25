@@ -1,5 +1,0 @@
-name: llm-math-education
-dependencies:
-  - python=3.10.*
-  - pip
-  - poetry

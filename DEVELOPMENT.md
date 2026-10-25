@@ -6,28 +6,20 @@ Basic background on developing from this codebase.
 
 ### First-time setup
 
-This repository uses Conda to manage two dependencies: Python and Poetry. ([This SO post](https://stackoverflow.com/a/71110028) provides more context on using Conda and Poetry together.)
-
-Install conda or miniconda. Then, create the needed environment, called `llm-math-education`.
+This repository uses [uv](https://docs.astral.sh/uv/) to manage Python and all dependencies. [Install uv](https://docs.astral.sh/uv/getting-started/installation/), then run:
 
 ```bash
-conda env create -f conda-environment.yml
+make install
 ```
 
-### Python development
-
-1. Activate the conda environment: `conda activate llm-math-education`
-2. Use `make install` to install all needed dependencies (including the pre-commit hooks).
-
-Ideally, the Makefile would activate the needed conda environment, but I don't actually know enough `make` to add that.
+This creates a `.venv` with the locked dependencies (`uv sync`), installs the pre-commit hooks, and registers a Jupyter kernel.
 
 ### Python releases
 
-To deploy to PyPI, set your API token and deploy (see [guide](https://www.digitalocean.com/community/tutorials/how-to-publish-python-packages-to-pypi-using-poetry-on-ubuntu-22-04)):
+To deploy to PyPI, bump the version in `pyproject.toml`, then build and publish with your PyPI API token:
 ```bash
-poetry config pypi-token.pypi "{your API token generated on pypi.org}"
-poetry build
-poetry publish
+uv build
+uv publish --token "{your API token generated on pypi.org}"
 ```
 
 ### OpenAI API env variable
@@ -46,29 +38,13 @@ make test
 
 ### Other useful commands
 
- - `poetry run <command>` - Run the given command, e.g. `poetry run pytest` invokes the tests.
- - `source $(poetry env info --path)/bin/activate` - An alternative to `poetry shell` that's less buggy in conda environments.
- - `poetry add <package>` - Add the given package as a dependency. Use flag `-G dev` to add it as a development dependency.
- - `conda remove -n llm-math-education --all` - Tear it all down, so first-time setup can be repeated.
+ - `uv run <command>` - Run the given command in the project environment, e.g. `uv run pytest` invokes the tests.
+ - `uv add <package>` - Add the given package as a dependency. Use flag `--dev` to add it as a development dependency.
+ - `uv lock --upgrade` - Upgrade all locked dependencies to the latest compatible versions.
 
-### Anserini support
+### Dependency updates
 
-To use Pyserini, need to install a few additional things.
-
-First, Java 7+ JDK should be installed and configured reasonably. I installed the latest build (JDK 20.0.1) with no issues.
-
-To install NMSLib: (see [issue](https://github.com/nmslib/nmslib/issues/476))
-    CFLAGS="-mavx -DWARN(a)=(a)" pip install --use-pep517 nmslib
-
-Ultimately, I added it to a new dependency group (`anserini`) like so:
-    CFLAGS="-mavx -DWARN(a)=(a)" poetry add nmslib -G anserini
-
-This likely means that rebuilds won't succeed without first installing nmslib with these CFLAGS, although I haven't tested it. Use `poetry install --with anserini` to include during a build.
-
-FAISS (needed for Pyserini) installed in the outer conda environment:
-    conda install -c pytorch faiss-cpu
-
-I did not include the FAISS dependency in `environment.yaml`.
+Dependabot (configured in `.github/dependabot.yml`) opens monthly PRs for Python dependencies (`uv.lock`), pre-commit hooks, GitHub Actions, and the Dockerfile base images. The `Tests` workflow runs the tests and pre-commit hooks on every PR.
 
 ### Streamlit
 
@@ -77,6 +53,7 @@ A few notes about the app.
 #### Deployment
 
 Manually deployed via `levon003`'s (GitHub-linked) [Streamlit account](https://share.streamlit.io/).
+Community Cloud installs dependencies from `uv.lock`. The app's Python version (currently 3.14) is set in the Streamlit console, and `.python-version` should match it.
 
 #### Authentication
 

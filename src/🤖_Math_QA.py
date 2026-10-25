@@ -1,4 +1,3 @@
-import locale
 import logging
 import time
 from datetime import datetime
@@ -70,13 +69,10 @@ def process_user_query(user_query: str):
                             value = "(none)"
                         s += "#### " + key + ":\n\n" + value.replace("\n", "\n\n") + "\n\n\n"
                     st.markdown(s)
-            completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0613",
-                messages=messages,
-                temperature=st.session_state.temperature,
-                request_timeout=20,
+            assistant_message = chat_utils.get_assistant_message(
+                messages,
+                timeout=20,
             )
-            assistant_message = completion["choices"][0]["message"]
             assert "role" in assistant_message and "content" in assistant_message
             st.session_state.prompt_manager.add_stored_message(assistant_message)
             # TODO add timestamp to message: int(datetime.now().timestamp())
@@ -95,19 +91,6 @@ def process_user_query(user_query: str):
         st.session_state.chat_messages.append(assistant_message)
 
 
-def update_temperature_setting():
-    locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
-    temperature_str = st.session_state["temperature_text_input"]
-    try:
-        new_temperature = locale.atof(temperature_str)
-        if new_temperature < 0 or new_temperature > 2:
-            raise ValueError("Invalid temperature range.")
-        st.session_state["temperature"] = new_temperature
-        st.session_state["temperature_text_input_valid"] = True
-    except ValueError:
-        st.session_state["temperature_text_input_valid"] = False
-
-
 def update_retrieval_setting():
     retrieval_str = st.session_state["retrieval_radio"]
     logging.info(
@@ -120,9 +103,6 @@ def update_retrieval_setting():
 def instantiate_session():
     # settings
     setting_defaults = {
-        "temperature": 1.0,
-        "temperature_text_input": "1.0",
-        "temperature_text_input_valid": True,
         "retrieval_radio": data_utils.RETRIEVAL_OPTIONS_LIST[0],
         "student_query_selectbox_new_value": None,
         "show_expert_controls": False,
@@ -275,9 +255,6 @@ After each query, the associated prompt is included in a drop-down (including an
                 st.markdown(
                     f"Used tokens: {st.session_state.prompt_manager.compute_stored_token_counts()} / {MAX_TOKENS}",
                 )
-                st.text_input("Temperature:", key="temperature_text_input", on_change=update_temperature_setting)
-                if not st.session_state["temperature_text_input_valid"]:
-                    st.warning("Invalid temperature setting; should be a decimal between 0 and 2.")
 
                 st.radio(
                     "Retrieval:",

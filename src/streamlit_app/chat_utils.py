@@ -1,5 +1,16 @@
 import time
 
+import openai
+
+CHAT_MODEL = "gpt-6-luna"
+
+
+def get_assistant_message(messages: list[dict], **kwargs) -> dict[str, str]:
+    """Request a chat completion, returning the assistant message as a plain dict."""
+    completion = openai.chat.completions.create(model=CHAT_MODEL, messages=messages, **kwargs)
+    message = completion.choices[0].message
+    return {"role": message.role, "content": message.content}
+
 
 def get_avatar(role: str) -> str | None:
     if role == "user":

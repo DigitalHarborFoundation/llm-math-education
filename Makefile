@@ -1,39 +1,26 @@
-.PHONY: help install ensure-poetry install-precommits install-kernel test run-streamlit run-hint-generation-streamlit build-docker run-docker
+.PHONY: help install install-precommits install-kernel test run-streamlit run-hint-generation-streamlit build-docker run-docker
 
 help:
 	@echo "Relevant targets are 'install' and 'test'."
 
 install:
-	@$(MAKE) ensure-poetry
+	@uv sync
 	@$(MAKE) install-precommits
 	@$(MAKE) install-kernel
 
-ensure-poetry:
-	@if [ "$(shell which poetry)" = "" ]; then \
-		echo "Did you activate the outer conda environment? Run: conda activate llm-math-education"; \
-		exit 1; \
-	else \
-		echo "Found existing Poetry installation at $(shell which poetry)."; \
-	fi
-	@poetry install
-
 install-precommits:
-	@poetry run pre-commit autoupdate
-	@poetry run pre-commit install --overwrite --install-hooks
+	@uv run pre-commit install --overwrite --install-hooks
 
 install-kernel:
-	@poetry run ipython kernel install --user --name=llm-math-education
+	@uv run ipython kernel install --user --name=llm-math-education
 
 jupyter:
-	@echo "Assuming Jupyter lab is installed and configured globally."
-	@jupyter lab
+	@uv run jupyter lab
 
 test:
-	@poetry run pytest --cov=src --cov-report term-missing
+	@uv run pytest --cov=src --cov-report term-missing
 
 build-docker:
-	@poetry build
-	#@poetry export --without-hashes --format=requirements.txt > streamlit-requirements.txt
 	@docker build -t rori_streamlit -f Dockerfile.streamlit .
 
 run-docker:
@@ -48,7 +35,7 @@ remove-docker:
 	@docker remove --volumes rori_streamlit_container
 
 run-streamlit:
-	@streamlit run src/🤖_Math_QA.py --
+	@uv run streamlit run src/🤖_Math_QA.py --
 
 run-hint-generation-streamlit:
-	@streamlit run src/hint_generation/app.py --
+	@uv run streamlit run src/hint_generation/app.py --

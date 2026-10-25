@@ -70,11 +70,11 @@ print(messages)
 # pass these messages to the OpenAI API
 import openai
 
-completion = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo-0613",
+completion = openai.chat.completions.create(
+    model="gpt-6-luna",
     messages=messages,
 )
-assistant_message = completion["choices"][0]["message"]
+assistant_message = {"role": "assistant", "content": completion.choices[0].message.content}
 print(assistant_message)
 
 # add stored messages to continue the conversation
