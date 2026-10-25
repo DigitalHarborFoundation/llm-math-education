@@ -16,11 +16,23 @@ This creates a `.venv` with the locked dependencies (`uv sync`), installs the pr
 
 ### Python releases
 
-To deploy to PyPI, bump the version in `pyproject.toml`, then build and publish with your PyPI API token:
-```bash
-uv build
-uv publish --token "{your API token generated on pypi.org}"
-```
+Releases to [PyPI](https://pypi.org/project/llm-math-education/) are manual; there is no publish workflow. The project is not actively maintained, so releases are occasional (e.g. 0.6.0 for the uv / OpenAI v1 migration).
+
+1. On an up-to-date `main`, bump the version (updates `pyproject.toml` and `uv.lock`) and merge that change:
+    ```bash
+    uv version --bump minor   # or: patch, major
+    ```
+2. Build and publish. `uv publish` uploads everything in `dist/`, so clear out old builds first. Authenticate with a PyPI API token (generated on pypi.org) as the password for the `__token__` user, e.g. via environment variables:
+    ```bash
+    rm -rf dist
+    uv build
+    UV_PUBLISH_TOKEN="{your PyPI API token}" uv publish
+    ```
+    The maintainer keeps the token in the local, gitignored `.env` as `PYPI_PASSWORD` (with `PYPI_USERNAME=__token__`), so this also works: `set -a && source .env && set +a && uv publish --username "$PYPI_USERNAME" --password "$PYPI_PASSWORD"`.
+3. Tag the release: `git tag v$(uv version --short) && git push origin --tags`.
+4. Check the release page: <https://pypi.org/project/llm-math-education/>.
+
+The Streamlit app is not part of the published package and deploys separately (see [Streamlit](#streamlit)).
 
 ### OpenAI API env variable
 

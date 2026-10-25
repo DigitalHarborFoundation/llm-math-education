@@ -179,7 +179,7 @@ See the [developer's guide](/DEVELOPMENT.md).
 
 Primary contributor:
 
- - Zachary Levonian (<levon003@umn.edu>)
+ - Zachary Levonian (<zach@levi.digitalharbor.org>)
 
 Other contributors:
 

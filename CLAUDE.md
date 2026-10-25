@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-`llm-math-education` is a Python package (published to PyPI) implementing simple retrieval-augmented generation (RAG) for middle-school math QA and hint generation, plus a Streamlit demo app. It uses the OpenAI Python SDK v1+ via the module-level client (`openai.api_key = ...`, `openai.chat.completions.create`, `openai.embeddings.create`). The project is in maintenance mode (see README FAQ).
+`llm-math-education` is a Python package (published to PyPI) implementing simple retrieval-augmented generation (RAG) for middle-school math QA and hint generation, plus a Streamlit demo app. It uses the OpenAI Python SDK v1+ via the module-level client (`openai.api_key = ...`, `openai.chat.completions.create`, `openai.embeddings.create`). The project is in maintenance mode (see README FAQ). PyPI releases are manual (`uv build` / `uv publish`); see "Python releases" in DEVELOPMENT.md.
 
 ## Environment and commands
 
@@ -34,7 +34,7 @@ Library code lives in `src/llm_math_education/`. The RAG flow is composed from t
 
 Prompt templates live in `prompts/mathqa.py` and `prompts/hints.py` (`intro_prompts` dicts). Other modules: `logit_bias` (builds OpenAI `logit_bias` from frequent tokens in retrieved text, using `resources/dolma_stopwords.json`), `openstax` (scrapes OpenStax textbooks; needs the `openstax` extra), `misconceptions`, `chat_db` (ndjson chat logging).
 
-Streamlit app code is outside the published package: `src/🤖_Math_QA.py` (entry point) and `src/pages/` form a multipage app, with helpers in `src/streamlit_app/` (`data_utils` builds the RetrievalDbs from the prebuilt `data/app_data` files for `rori_microlesson` and `openstax_subsection`; these embeddings were made with `text-embedding-ada-002`, so changing `EMBEDDING_MODEL` requires regenerating them). The apps' chat model is `chat_utils.CHAT_MODEL`, and `chat_utils.get_assistant_message` converts responses to plain `{"role", "content"}` dicts, which is what `PromptManager` stores. `Dockerfile.streamlit` packages the app, and the GitHub Action pushes the image to GCP Artifact Registry on every push to `main`.
+Streamlit app code is outside the published package: `src/🤖_Math_QA.py` (entry point) and `src/pages/` form a multipage app, with helpers in `src/streamlit_app/` (`data_utils` builds the RetrievalDbs from the prebuilt `data/app_data` files for `rori_microlesson` and `openstax_subsection`; these embeddings were made with `text-embedding-ada-002`, so changing `EMBEDDING_MODEL` requires regenerating them). The apps' chat model is `chat_utils.CHAT_MODEL`, and `chat_utils.get_assistant_message` converts responses to plain `{"role", "content"}` dicts, which is what `PromptManager` stores. The live demo deploys from `main` on Streamlit Community Cloud (installs from `uv.lock`; Python version set in the Streamlit console), and `Dockerfile.streamlit` packages the app for running it elsewhere.
 
 `notebook/` holds exploratory/data-prep notebooks and `boneyard/` holds discarded Streamlit experiments. Neither is used by the package.
 
