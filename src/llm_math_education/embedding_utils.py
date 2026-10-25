@@ -41,8 +41,8 @@ def get_openai_embeddings(texts: list[str], embedding_model: str = EMBEDDING_MOD
 
 @functools.lru_cache(maxsize=512, typed=True)
 def get_openai_embeddings_cached(texts: tuple[str], embedding_model: str = EMBEDDING_MODEL) -> list[np.array]:
-    result = openai.Embedding.create(input=texts, engine=embedding_model)
-    embedding_list = [np.array(d["embedding"]) for d in result.data]
+    result = openai.embeddings.create(input=list(texts), model=embedding_model)
+    embedding_list = [np.array(d.embedding) for d in result.data]
     return embedding_list
 
 

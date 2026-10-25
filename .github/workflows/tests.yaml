@@ -1,0 +1,18 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+      - name: Run tests
+        run: uv run --locked pytest --cov=src --cov-report term-missing
+      - name: Run pre-commit hooks
+        run: uv run --locked pre-commit run --all-files --show-diff-on-failure

@@ -50,7 +50,7 @@ These usage examples can be seen together in [src/usage_demo.py](/src/usage_demo
 To do retrieval augmented generation, we need data.
 We'll use an OpenStax Pre-algebra textbook as our retrieval data.
 
-Note: the `llm_math_education.openstax` module relies on `requests` and `beautifulsoup4`, which are not listed as dependencies. Install them yourself with `pip` if you want to download and parse OpenStax textbooks.
+Note: the `llm_math_education.openstax` module relies on `requests` and `beautifulsoup4`, which are installed via the `openstax` extra: `pip install "llm-math-education[openstax]"`.
 
 ```python
 from llm_math_education import openstax
@@ -138,11 +138,11 @@ We can pass the formatted messages to the OpenAI API.
 
 ```python
 import openai
-completion = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo-0613",
+completion = openai.chat.completions.create(
+    model="gpt-6-luna",
     messages=messages,
 )
-assistant_message = completion["choices"][0]["message"]
+assistant_message = {"role": "assistant", "content": completion.choices[0].message.content}
 
 >>> assistant_message
 {

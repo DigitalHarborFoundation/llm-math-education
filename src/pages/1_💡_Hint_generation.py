@@ -47,11 +47,7 @@ def process_hint_query(messages: list[dict]):
     with st.chat_message("assistant", avatar=chat_utils.get_avatar("assistant")):
         message_placeholder = st.empty()
         with st.spinner(""):
-            completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0613",
-                messages=messages,
-            )
-            assistant_message = completion["choices"][0]["message"]
+            assistant_message = chat_utils.get_assistant_message(messages)
             assert "role" in assistant_message and "content" in assistant_message
             st.session_state.hint_prompt_manager.add_stored_message(assistant_message)
         response = assistant_message["content"]
@@ -96,11 +92,7 @@ def process_followup_query(user_query: str):
 
         with st.spinner(""):
             messages = st.session_state.hint_prompt_manager.build_query(user_query)
-            completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0613",
-                messages=messages,
-            )
-            assistant_message = completion["choices"][0]["message"]
+            assistant_message = chat_utils.get_assistant_message(messages)
             assert "role" in assistant_message and "content" in assistant_message
         response = assistant_message["content"]
         for displayed_message in chat_utils.stream_text_response(response):
