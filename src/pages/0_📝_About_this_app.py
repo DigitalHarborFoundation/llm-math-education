@@ -20,8 +20,8 @@ Contact Zach (<levon003@umn.edu>) with any questions.
 
 #### Code and data
 
-This app's code is hosted [on GitHub](https://github.com/levon003/llm-math-education).
-Feel free to open an [issue](https://github.com/levon003/llm-math-education/issues) with questions, comments, or requests.
+This app's code is hosted [on GitHub](https://github.com/DigitalHarborFoundation/llm-math-education).
+Feel free to open an [issue](https://github.com/DigitalHarborFoundation/llm-math-education/issues) with questions, comments, or requests.
 
 This app currently uses data from a few sources:
  - Sample student queries are from [MathNation](https://www.mathnation.com/).
